@@ -1,0 +1,30 @@
+.wordmark {
+  display: flex;
+  flex-direction: column;
+  gap: 0.125rem;
+  color: var(--ink);
+}
+
+.name {
+  font-family: var(--font-wordmark);
+  font-weight: 900;
+  font-style: italic;
+  font-size: var(--size, 1.875rem);
+  line-height: 0.95;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.name em {
+  font-style: inherit;
+  color: var(--green);
+}
+
+.role {
+  font-size: max(0.5rem, calc(var(--size, 1.875rem) * 0.37));
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.24em;
+  color: var(--ink-400);
+  text-transform: uppercase;
+}

@@ -1,0 +1,214 @@
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: var(--navy-deep);
+  border: 2px solid var(--green);
+  border-radius: 0.875rem;
+  box-shadow: 0 0 40px rgb(41 234 40 / 0.25);
+  transition: border-color 0.2s ease;
+}
+
+.card[data-invalid='true'] {
+  border-color: rgb(255 107 107 / 0.7);
+}
+
+.cardHead {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+}
+
+.cardTitle {
+  font-size: clamp(1.1875rem, 1.05rem + 0.5vw, 1.5rem);
+  font-weight: 900;
+  line-height: 1.1;
+  color: var(--ink);
+}
+
+.cardSub {
+  font-size: var(--step-small);
+  color: var(--ink-400);
+}
+
+/* --- Fields --------------------------------------------------------------- */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+/* Cidade + bairro share a row only once there is room for both placeholders;
+   side by side at 390px the city label truncates mid-word. */
+.row {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 0.75rem;
+}
+
+@media (min-width: 30rem) {
+  .row {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.input {
+  width: 100%;
+  padding: 0.9375rem 1rem;
+  background: var(--field);
+  border: 1px solid var(--field-border);
+  border-radius: 0.5625rem;
+  font-size: 1rem; /* 16px keeps iOS from zooming on focus */
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink);
+  outline: none;
+  transition:
+    border-color 0.16s ease,
+    background-color 0.16s ease;
+}
+
+.input::placeholder {
+  color: var(--ink-400);
+}
+
+.input:focus {
+  border-color: var(--green);
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--green);
+  outline-offset: 1px;
+}
+
+.input[aria-invalid='true'] {
+  background: var(--danger-bg);
+  border-color: var(--danger);
+}
+
+.input:disabled {
+  color: var(--ink-500);
+  cursor: not-allowed;
+}
+
+.error {
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--danger-text);
+}
+
+/* --- Help options --------------------------------------------------------- */
+.help {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5625rem;
+  margin: 0.125rem 0 0;
+  padding: 0;
+  border: none;
+}
+
+.helpLegend {
+  padding: 0;
+  margin-bottom: 0.5625rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  color: var(--green-soft);
+  text-transform: uppercase;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.2;
+  color: var(--ink-100);
+  cursor: pointer;
+}
+
+.option input {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  accent-color: var(--green);
+  cursor: pointer;
+}
+
+/* --- Alert ---------------------------------------------------------------- */
+.alert {
+  display: flex;
+  gap: 0.625rem;
+  padding: 0.75rem 0.875rem;
+  background: rgb(255 107 107 / 0.12);
+  border: 1px solid rgb(255 107 107 / 0.5);
+  border-radius: 0.5625rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--danger-soft);
+}
+
+/* --- Submit --------------------------------------------------------------- */
+.submit {
+  margin-top: 0.375rem;
+  background: linear-gradient(180deg, var(--green), var(--green-deep));
+  border-radius: 0.6875rem;
+  padding-block: 1.0625rem;
+  box-shadow: 0 10px 30px rgb(41 234 40 / 0.35);
+}
+
+.submit:disabled {
+  cursor: progress;
+  transform: none;
+  filter: none;
+  background: var(--green-deep);
+  box-shadow: none;
+}
+
+.spinner {
+  flex: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 3px solid rgb(1 46 64 / 0.35);
+  border-top-color: var(--navy);
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    rotate: 360deg;
+  }
+}
+
+.note {
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: var(--ink-500);
+  text-align: center;
+}
+
+/* Off-screen but still submitted — only a bot fills this in. */
+.trap {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (min-width: 48rem) {
+  .card {
+    gap: 1rem;
+    padding: 1.875rem;
+    border-radius: 1rem;
+    box-shadow: 0 0 60px rgb(41 234 40 / 0.28);
+  }
+}

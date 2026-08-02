@@ -1,0 +1,117 @@
+.section {
+  position: relative;
+  isolation: isolate;
+  background: var(--navy-deep);
+  overflow: hidden;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background-image: url('/textures/manifesto.jpg');
+  background-image: image-set(
+    url('/textures/manifesto.avif') type('image/avif'),
+    url('/textures/manifesto.jpg') type('image/jpeg')
+  );
+  background-size: cover;
+  background-position: 70% 30%;
+  opacity: 0.2;
+  filter: saturate(0.7);
+}
+
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgb(1 30 43 / 0.85), rgb(1 30 43 / 0.95));
+}
+
+.inner {
+  display: grid;
+  gap: 1.25rem;
+  padding-block: 2.25rem 2.5rem;
+}
+
+.head,
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+  max-width: 47.5rem;
+}
+
+.title {
+  font-size: var(--step-h2);
+  font-weight: 900;
+  line-height: 1.05;
+  text-transform: uppercase;
+}
+
+.title em {
+  font-style: normal;
+  color: var(--green);
+}
+
+.body p {
+  color: var(--ink-200);
+  line-height: 1.6;
+}
+
+.body strong {
+  font-weight: 700;
+  color: var(--green);
+}
+
+.body b {
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.portrait {
+  position: relative;
+  aspect-ratio: 4 / 3;
+  border: 1px solid rgb(41 234 40 / 0.3);
+  border-radius: 0.75rem;
+  overflow: hidden;
+}
+
+.portrait img {
+  object-fit: cover;
+  object-position: 50% 18%;
+}
+
+@media (min-width: 64rem) {
+  .scrim {
+    background: linear-gradient(
+      90deg,
+      var(--navy-deep) 12%,
+      rgb(1 30 43 / 0.72) 60%,
+      rgb(1 46 64 / 0.35) 100%
+    );
+  }
+
+  .inner {
+    grid-template-columns: minmax(0, 1fr) 23.75rem;
+    align-items: start;
+    column-gap: 3.75rem;
+    row-gap: 1.375rem;
+    padding-block: 5.5rem 5.75rem;
+  }
+
+  .head,
+  .body {
+    grid-column: 1;
+    gap: 1.375rem;
+  }
+
+  /* On mobile the portrait breaks up the read, sitting between the headline
+     and the story. On desktop it spans both rows in the right column. */
+  .portrait {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    aspect-ratio: 19 / 24;
+    border-radius: 0.875rem;
+  }
+}

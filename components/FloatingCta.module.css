@@ -1,0 +1,46 @@
+.cta {
+  position: fixed;
+  inset: auto 0.875rem calc(1rem + env(safe-area-inset-bottom));
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  padding: 1rem 0.875rem;
+  background: linear-gradient(180deg, var(--green), var(--green-deep));
+  border-radius: 0.75rem;
+  box-shadow: 0 12px 34px rgb(0 0 0 / 0.55);
+  color: var(--navy);
+  font-size: 0.8125rem;
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  text-align: center;
+  text-transform: uppercase;
+
+  /* Animated, not toggled with display, so it can transition. */
+  opacity: 0;
+  translate: 0 130%;
+  visibility: hidden;
+  transition:
+    opacity 0.25s ease,
+    translate 0.25s ease,
+    visibility 0.25s;
+}
+
+.cta:hover {
+  color: var(--navy);
+}
+
+.visible {
+  opacity: 1;
+  translate: 0 0;
+  visibility: visible;
+}
+
+/* Desktop keeps the sticky header CTA, so this would just be noise. */
+@media (min-width: 64rem) {
+  .cta {
+    display: none;
+  }
+}

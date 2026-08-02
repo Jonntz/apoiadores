@@ -1,0 +1,7 @@
+# Raw sources are only needed by the local asset pipeline. Keeping them out of
+# the deployment upload cuts build time and bundle trace size.
+Fotos Biancardine 2026/
+neo-sans-std/
+scripts/
+*.pdf
+/logo.png
