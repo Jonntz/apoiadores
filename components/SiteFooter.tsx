@@ -16,7 +16,7 @@ export function SiteFooter() {
         </blockquote>
 
         <a className="btn" href="#cadastro">
-          Junte-se à militância digital do Matheusinho
+          Junte-se à militância digital do Matheuzinho
           {Arrow}
         </a>
 

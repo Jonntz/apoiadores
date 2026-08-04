@@ -154,13 +154,21 @@ contador de dias). Fontes com `immutable`.
 
 | | gzip |
 | --- | --- |
-| HTML | 8,5 KB |
-| CSS | 2,2 KB |
-| JS | 169 KB |
+| HTML | 8,7 KB |
+| CSS | 2,4 KB |
+| JS | 170 KB |
 | Fontes (5 woff2) | 78 KB |
-| **Total crítico** | **~251 KB** |
+| **Total crítico** | **~259 KB** |
 
 Mais as artes: **104 KB** no desktop, **37 KB** no mobile.
+
+Fora do caminho crítico, o **gtag.js pesa 165 KB gzip** (485 KB descomprimidos)
+— praticamente dobra o JS da página. Carrega depois que a página já está usável,
+então não entra em LCP nem em TTI, mas são 485 KB para o celular interpretar e
+executar depois. Se algum dia esse custo incomodar, a alternativa é trocar o
+gtag.js pelo **Measurement Protocol**, disparando a conversão do servidor dentro
+da própria server action: zero JS de terceiro no navegador. Dá mais trabalho e
+perde os relatórios automáticos de navegação do GA4.
 
 Para comparação, a referência baixa 449 KB só no `BLOCO1.webp`, porque nela o
 texto é pixel dentro da imagem.
@@ -209,29 +217,40 @@ A página `/obrigado` continua existindo (noindex) para link direto, mas **não 
 mais alcançada pelo fluxo do formulário** — a conversão acontece sem trocar de
 URL. Por isso o evento é disparado no lugar do pageview; veja abaixo.
 
-### Conversão para o time de tráfego
+### Google Analytics e conversão
 
-Ao abrir o modal de sucesso, `lib/analytics.ts` empilha um único evento:
+O site roda **gtag.js (GA4), medição `G-EPPF1NZDSD`**, carregado em
+`app/layout.tsx` com `strategy="afterInteractive"` — analytics nunca entra no
+caminho crítico. O ID sai de `NEXT_PUBLIC_GA_ID` se você quiser separar
+ambientes; o padrão está em `lib/analytics.ts`.
+
+Ao abrir o modal de sucesso, o cadastro é reportado como evento GA4:
 
 ```js
-window.dataLayer.push({ event: 'cadastro_apoiador' })
+gtag('event', 'cadastro_apoiador')
 ```
 
-Configure o gatilho do GTM em **Custom Event → `cadastro_apoiador`** e pendure
-nele as tags de Google Ads / Meta / GA4. Não é preciso instalar nada no código:
-o push acontece mesmo antes do container carregar (o GTM foi desenhado para ler
-a fila do `dataLayer` quando inicializa), então basta colar o container.
+**Falta um passo do lado do GA4:** coletar o evento não é o mesmo que contá-lo.
+Marque `cadastro_apoiador` como *evento-chave* em **Admin → Eventos** para ele
+virar conversão e ficar disponível no Google Ads.
 
-Três decisões que valem saber:
+Quatro decisões que valem saber:
 
-- **Um sinal só.** O código não chama `gtag()` nem `fbq()` diretamente. Se
-  chamasse, e o container também disparasse no mesmo evento, cada lead contaria
-  duas vezes.
+- **É `gtag()`, não `dataLayer.push({event})`.** Os dois formatos não são
+  intercambiáveis: o GTM escuta objetos com a chave `event`, enquanto o gtag.js
+  trata o array como fila de `arguments` e ignora o resto. Um push simples
+  nunca chegaria ao GA4.
+- **Um sinal só.** Se um container GTM entrar depois, ele dispara em cima deste
+  mesmo evento — disparar um segundo sinal aqui contaria cada lead duas vezes.
 - **Sem dado pessoal no payload.** O `dataLayer` é legível por qualquer tag da
   página; nome e telefone ficam só na planilha.
 - **Cadastro repetido não conta.** Quem já está na planilha recebe
   `status: 'duplicate'` e nenhum evento é disparado — o número de conversões
   bate com o número de linhas novas.
+
+O GA4 agrupa eventos antes de mandar: o hit de `cadastro_apoiador` sai cerca de
+**5 segundos** depois do envio, não na hora. Ao testar no DebugView, conte com
+esse atraso antes de achar que não funcionou.
 
 ### Cadastro duplicado
 

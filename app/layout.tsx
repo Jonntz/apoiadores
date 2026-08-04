@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Barlow, Barlow_Condensed } from 'next/font/google';
+import Script from 'next/script';
+import { GA_MEASUREMENT_ID } from '@/lib/analytics';
 import { CANDIDATE, SITE_URL } from '@/lib/site';
 import './globals.css';
 
@@ -87,6 +89,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           Ir para o cadastro
         </a>
         {children}
+
+        {/* Google tag (gtag.js) — GA4.
+            afterInteractive, not beforeInteractive: analytics must never sit on
+            the critical path. It loads once the page is usable, so it costs
+            nothing in LCP or in time to first interaction. */}
+        <Script
+          src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
+          strategy="afterInteractive"
+        />
+        <Script id="gtag-init" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_MEASUREMENT_ID}');`}
+        </Script>
       </body>
     </html>
   );

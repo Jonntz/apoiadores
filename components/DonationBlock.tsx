@@ -13,9 +13,15 @@ import styles from './DonationBlock.module.css';
 export function DonationBlock() {
   return (
     <>
-      <div className={styles.topbar}>
-        <span className={styles.topbarText}>&bull; Seja um apoiador &bull;</span>
-      </div>
+      {/* The whole rule is the hit area — it is the first thing on the page and
+          it now sends you straight to the form. The bullets are decoration, so
+          the link is announced as just "Seja um apoiador". */}
+      <a className={styles.topbar} href="#cadastro">
+        <span className={styles.topbarText}>
+          <span aria-hidden="true">&bull;</span> Seja um apoiador{' '}
+          <span aria-hidden="true">&bull;</span>
+        </span>
+      </a>
 
       <section className={styles.section} id="topo" aria-labelledby="doacao-titulo">
         <ArtBackdrop
@@ -31,7 +37,7 @@ export function DonationBlock() {
           </h2>
           <p className={styles.sub}>Considere fazer uma doação e ajudar a liberdade!</p>
           <a
-            className="btn"
+            className="btn btn--lg"
             href={LINKS.donate}
             target="_blank"
             rel="noopener noreferrer"

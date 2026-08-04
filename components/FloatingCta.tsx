@@ -59,7 +59,7 @@ export function FloatingCta() {
       aria-hidden={!visible}
       tabIndex={visible ? undefined : -1}
     >
-      Junte-se à militância digital do Matheusinho
+      Junte-se à militância digital do Matheuzinho
       {Arrow}
     </a>
   );

@@ -155,6 +155,7 @@ ol {
 /* The signature control: condensed uppercase on a neon slab with a double
    halo. Everything green on the page is one of these. */
 .btn {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -190,17 +191,53 @@ ol {
   transform: translateY(0);
 }
 
+/* --- Pulsing halo --------------------------------------------------------- */
+/* Only the pseudo-element's opacity animates. The compositor runs that on its
+   own thread without repainting the button, so a page full of pulsing CTAs
+   costs no layout and no paint work per frame — animating box-shadow directly
+   on .btn would repaint every one of them, every frame.
+   The pseudo has no background: all that is ever drawn is the shadow it casts
+   outside its box, so it can sit over the button without covering the label. */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 26px rgb(0 223 0 / 0.9), 0 0 64px rgb(0 223 0 / 0.55);
+  opacity: 0;
+  pointer-events: none;
+  animation: pulse 2.2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 1;
+  }
+}
+
 .btn--block {
   display: flex;
   width: 100%;
 }
 
-/* Secondary action next to a primary one: same shape, none of the pull. */
+/* The initial CTA carries the first ask on the page, so it runs a size up. */
+.btn--lg {
+  font-size: clamp(1.375rem, 1.05rem + 1.3vw, 2rem);
+  padding: 1.25rem 2.4rem;
+  border-radius: 1.5rem;
+}
+
+/* Secondary action next to a primary one: same shape, none of the pull —
+   including the pulse, which is what marks the primary action out from it. */
 .btn--ghost {
   background: transparent;
   color: var(--primary);
   border: 1px solid rgb(0 223 0 / 0.55);
   box-shadow: none;
+}
+
+.btn--ghost::after {
+  animation: none;
 }
 
 .btn--ghost:hover {

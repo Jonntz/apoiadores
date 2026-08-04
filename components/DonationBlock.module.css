@@ -1,25 +1,48 @@
 /* --- Bloco 0: faixa "Seja um apoiador" ----------------------------------- */
 .topbar {
+  display: block;
   position: relative;
   z-index: 2;
-  padding-block: 0.75rem;
+  padding-block: 0.7rem;
+  padding-inline: 0.75rem;
   background: var(--bg);
   border-bottom: 2px solid var(--primary);
   text-align: center;
 }
 
 .topbarText {
+  --tracking: 0.34em;
+
   display: inline-block;
   font-family: var(--display);
-  font-size: clamp(0.8125rem, 0.72rem + 0.4vw, 1.125rem);
+  /* Proportional to the viewport below the cap instead of a clamp with a fixed
+     floor: the line then scales down with the screen at the same rate it would
+     need to in order to fit, so paired with nowrap it can never wrap — and
+     never overflow either. The cap is what it settles at from ~510px up. */
+  font-size: min(5.5vw, 1.75rem);
   font-weight: 700;
   line-height: 1;
-  letter-spacing: 0.34em;
+  letter-spacing: var(--tracking);
   /* letter-spacing pads the right edge; pull it back so the dots read centred. */
-  text-indent: 0.34em;
+  text-indent: var(--tracking);
+  white-space: nowrap;
   text-transform: uppercase;
   color: var(--primary);
   text-shadow: 0 0 18px rgb(0 223 0 / 0.55);
+  animation: blink 2.2s ease-in-out infinite;
+}
+
+/* Fades the glow with the text, so it reads as a neon blink rather than a
+   flicker. Opacity only — composited, no repaint. */
+@keyframes blink {
+  50% {
+    opacity: 0.42;
+  }
+}
+
+.topbar:hover .topbarText {
+  color: var(--fg);
+  text-shadow: 0 0 22px rgb(0 223 0 / 0.85);
 }
 
 /* --- Bloco 1: doação ------------------------------------------------------ */
