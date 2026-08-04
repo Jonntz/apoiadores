@@ -6,8 +6,12 @@ import type { FieldErrors, SupporterFields } from './validation';
  * shipped to the client as a callable and blow up on first render.
  */
 export type FormState = {
-  /** 'success' is what opens the confirmation modal over the landing page. */
-  status: 'idle' | 'invalid' | 'error' | 'success';
+  /**
+   * 'success' and 'duplicate' both open the confirmation modal over the landing
+   * page; they are kept apart because only 'success' wrote a new row, and so
+   * only 'success' is a conversion worth reporting to the ads platform.
+   */
+  status: 'idle' | 'invalid' | 'error' | 'success' | 'duplicate';
   message?: string;
   errors?: FieldErrors;
   /** Echoed back so a no-JS submit re-renders with the values still filled in. */

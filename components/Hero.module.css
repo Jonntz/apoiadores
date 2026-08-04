@@ -1,159 +1,85 @@
 .hero {
   position: relative;
-  background: radial-gradient(120% 130% at 0% 0%, #024152 0%, var(--navy) 55%, var(--navy-deep) 100%);
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  aspect-ratio: 600 / 899;
   overflow: hidden;
 }
 
-.inner {
-  display: grid;
-  gap: 2rem;
-  padding-block: 2.25rem 3rem;
+/* The subject sits right of centre on both boards, so the copy column gets a
+   scrim heavy on the left and clear on the right. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    90deg,
+    rgb(0 30 55 / 0.94) 0%,
+    rgb(0 30 55 / 0.82) 42%,
+    rgb(0 30 55 / 0.28) 78%,
+    transparent 100%
+  );
 }
 
-.copy {
+.inner {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 1.25rem;
+  /* Generous on desktop so the centred block fills the board the way the
+     reference's baked-in typesetting does. */
+  gap: clamp(0.875rem, 0.2rem + 2.6vw, 3.3rem);
 }
 
-.badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.625rem;
-  padding: 0.5rem 0.9375rem;
-  background: rgb(41 234 40 / 0.12);
-  border: 1px solid rgb(41 234 40 / 0.45);
-  border-radius: 999px;
-}
-
-.dot {
-  flex: none;
-  width: 0.5rem;
-  height: 0.5rem;
-  background: var(--green);
-  border-radius: 50%;
-  box-shadow: 0 0 12px var(--green);
-}
-
-.badge span:last-child {
-  font-size: var(--step-eyebrow);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.18em;
-  color: var(--green);
-  text-transform: uppercase;
+/* 43rem lands the headline on three lines at 1440, matching the reference. */
+.copy {
+  max-width: 43rem;
 }
 
 .title {
-  font-size: var(--step-h1);
-  font-weight: 900;
-  line-height: 1.02;
+  font-size: var(--step-hero);
+  font-weight: 700;
+  line-height: 1.04;
+  text-transform: uppercase;
+  text-wrap: balance;
 }
 
 .title em {
   font-style: normal;
-  color: var(--green);
+  color: var(--primary);
 }
 
 .lead {
-  max-width: 39rem;
-  font-size: var(--step-lead);
-  color: var(--ink-200);
+  max-width: 35rem;
+  font-size: clamp(0.9375rem, 0.88rem + 0.3vw, 1.125rem);
+  color: rgb(246 249 252 / 0.92);
+}
+
+.lead + .lead {
+  margin-top: 0.875rem;
 }
 
 .punch {
-  max-width: 39rem;
-  font-size: clamp(1rem, 0.88rem + 0.5vw, 1.3125rem);
-  font-weight: 800;
-  line-height: 1.4;
-  color: var(--ink);
+  max-width: 35rem;
+  font-size: clamp(0.9375rem, 0.88rem + 0.3vw, 1.125rem);
+  font-weight: 700;
+  color: var(--fg);
 }
 
-.actions {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  gap: 0.875rem;
-  width: 100%;
-  margin-top: 0.25rem;
-}
-
-.reassure {
-  font-size: var(--step-small);
-  font-weight: 600;
-  line-height: 1.4;
-  color: var(--ink-400);
-}
-
-.figure {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  border: 1px solid rgb(41 234 40 / 0.3);
-  border-radius: 0.875rem;
-  overflow: hidden;
-}
-
-.photo {
-  object-fit: cover;
-  object-position: 55% 22%;
-}
-
-.scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(200deg, rgb(1 46 64 / 0.1) 0%, rgb(1 46 64 / 0.78) 100%);
-}
-
-.caption {
-  position: absolute;
-  inset: auto 1.25rem 1.125rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
-
-.captionTitle {
-  font-size: clamp(0.9375rem, 0.82rem + 0.5vw, 1.375rem);
-  font-weight: 900;
-  line-height: 1.15;
-  color: var(--ink);
-}
-
-.captionMeta {
-  font-size: var(--step-eyebrow);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: 0.16em;
-  color: var(--green);
-  text-transform: uppercase;
-}
-
-@media (min-width: 40rem) {
-  .actions {
-    flex-direction: row;
-    align-items: center;
-    gap: 1.25rem;
+@media (min-width: 48rem) {
+  .hero {
+    aspect-ratio: 1920 / 1080;
   }
 
-  .actions > :first-child {
-    flex: none;
-  }
-}
-
-@media (min-width: 64rem) {
-  .inner {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 38.75rem);
-    align-items: center;
-    gap: 3rem;
-    padding-block: 5.25rem 5.5rem;
-  }
-
-  .copy {
-    gap: 1.875rem;
-  }
-
-  .figure {
-    aspect-ratio: 1 / 1;
+  .scrim {
+    background: linear-gradient(
+      90deg,
+      rgb(0 30 55 / 0.9) 0%,
+      rgb(0 30 55 / 0.72) 38%,
+      rgb(0 30 55 / 0.12) 70%,
+      transparent 88%
+    );
   }
 }

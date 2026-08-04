@@ -1,12 +1,19 @@
 'use server';
 
 import { headers } from 'next/headers';
-import { appendRow } from '@/lib/sheets';
+import { appendRow, readColumn } from '@/lib/sheets';
 import type { FormState } from '@/lib/form-state';
-import { normalize, validateAll, type SupporterFields } from '@/lib/validation';
+import { normalize, onlyDigits, validateAll, type SupporterFields } from '@/lib/validation';
 
-/** A real person needs more than a couple of seconds to fill five fields. */
+/** A real person needs more than a couple of seconds to fill four fields. */
 const MIN_FILL_MS = 2500;
+
+/**
+ * Column holding the WhatsApp number — the third value written by `appendRow`
+ * below. It is the deduplication key: names and cities repeat, a mobile line
+ * belongs to one person.
+ */
+const WHATSAPP_COLUMN = 'C';
 
 const dateTimeInBrasilia = new Intl.DateTimeFormat('pt-BR', {
   timeZone: 'America/Sao_Paulo',
@@ -27,16 +34,10 @@ export async function registerSupporter(
     nome: readString(formData, 'nome'),
     whatsapp: readString(formData, 'whatsapp'),
     cidade: readString(formData, 'cidade'),
-    bairro: readString(formData, 'bairro'),
-    ajuda: formData.getAll('ajuda').filter((v): v is string => typeof v === 'string'),
+    ajuda: readString(formData, 'ajuda'),
   };
 
-  const echo = {
-    nome: fields.nome,
-    whatsapp: fields.whatsapp,
-    cidade: fields.cidade,
-    bairro: fields.bairro,
-  };
+  const echo = { ...fields };
 
   // --- Anti-spam ------------------------------------------------------------
   // Two cheap checks instead of a CAPTCHA: a field only a bot fills in, and the
@@ -64,14 +65,28 @@ export async function registerSupporter(
   const clean = normalize(fields);
   const requestHeaders = await headers();
 
+  // --- Deduplication --------------------------------------------------------
+  // Compared on digits only, because the column is read back as a number and a
+  // row typed by hand may carry a mask. Fails *open*: if the read breaks, we
+  // still save. A duplicated row is a nuisance to clean up; a supporter lost to
+  // an outage is gone for good.
+  let alreadyRegistered = false;
+  try {
+    const registered = await readColumn(WHATSAPP_COLUMN);
+    alreadyRegistered = registered.some((cell) => onlyDigits(cell) === clean.whatsapp);
+  } catch (error) {
+    console.error('[registerSupporter] duplicate check failed, saving anyway', error);
+  }
+
+  if (alreadyRegistered) return { status: 'duplicate' };
+
   try {
     await appendRow([
       dateTimeInBrasilia.format(new Date()),
       clean.nome,
       clean.whatsapp,
       clean.cidade,
-      clean.bairro,
-      clean.ajuda.join(', '),
+      clean.ajuda,
       readString(formData, 'utm_source'),
       readString(formData, 'utm_medium'),
       readString(formData, 'utm_campaign'),

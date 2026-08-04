@@ -36,7 +36,7 @@ nunca chegam ao browser.
 são gravadas:
 
 ```
-Data/Hora | Nome | WhatsApp | Cidade | Bairro | Como quer ajudar | utm_source | utm_medium | utm_campaign | utm_content | utm_term | Referrer
+Data/Hora | Nome | WhatsApp | Cidade | Como quer ajudar | utm_source | utm_medium | utm_campaign | utm_content | utm_term | Referrer
 ```
 
 **2. Crie a service account.**
@@ -79,58 +79,48 @@ assets já otimizados vão para produção.
 
 ## Pipeline de assets
 
-As fontes originais ficam fora do build e **não** vão para produção. Rode os
-scripts só quando trocar foto ou fonte; a saída é versionada.
-
-### Fotos
-
-`scripts/prepare-assets.mjs` reduz as 8 fotos para o maior tamanho que o layout
-realmente pinta, remove EXIF e gera o card social:
+As artes originais ficam em `assets/fundos/` e **não** vão para produção. Rode o
+script só quando trocar arte; a saída é versionada.
 
 ```bash
 node scripts/prepare-assets.mjs
 ```
 
-Origem: `Fotos Biancardine 2026/` → saída: `assets/`, `public/textures/`, `public/og.jpg`.
+`assets/fundos/` → `public/art/` + `public/og.jpg`.
 
-As fotos foram identificadas por EXIF (câmera + timestamp) a partir do arquivo de
-design:
+Os seis quadros entregues se dividem em dois grupos:
 
-| Design | Original |
+| Bloco | Uso |
 | --- | --- |
-| `hero-palco` | `IMG_6672.JPG` |
-| `grupo` | `Renova br/MMZ07112.jpeg` |
-| `manifesto` | `FT_06483.jpeg` |
-| `retrato-novo` | `MATHEUS 121.jpeg` |
-| `fala-microfone` | `@dianematosfotografa29.jpeg` |
-| `evento1` | `Renova br/ANM_8387.jpeg` |
-| `evento2` | `Renova br/R6A_6354.jpeg` |
-| `bh-predio` | `DSC_1792.jpeg` |
+| BLOCO1 / 1m | Arte da faixa de doação (logo + apoiadores) |
+| BLOCO2 / 2m | Arte do hero (Matheus ao microfone) |
+| BLOCO5 / 5m | Arte do manifesto |
+| BLOCO3, 4, 6 | Gradientes chapados — **refeitos em CSS**, não viram imagem |
 
-Créditos nos metadados originais: Marco Torelli, Arthur Menescal, @dianematosfotografa.
+Cada arte sai em AVIF + WebP + JPEG, nas versões desktop (1920x1080) e mobile
+(600x899), consumidas por um `<picture>` com `media="(min-width: 48rem)"`. O
+navegador baixa **exatamente um arquivo** por seção, direto do CDN, sem passar
+pelo otimizador de imagem.
+
+| | AVIF baixado |
+| --- | --- |
+| Desktop (3 artes) | 104 KB |
+| Mobile (3 artes) | 37 KB |
+
+> **Resolução do mobile:** os cortes verticais entregues têm 600px de largura.
+> Num aparelho de 390px com DPR 3 isso fica levemente suave. Se quiser nitidez
+> total, exporte os `BLOCO*m` a 1200x1798 e rode o script de novo — nada mais
+> muda.
 
 ### Fontes
 
-Neo Sans Std (identidade visual) convertida de OTF para WOFF2 com subset
-Latin + acentuação pt-BR. Requer `pip install fonttools brotli`:
+Barlow + Barlow Condensed, o mesmo par da referência, via `next/font/google`.
+Diferente da referência, que busca no `fonts.googleapis.com` em runtime, aqui
+elas são baixadas no build e servidas do próprio domínio — sem DNS nem conexão
+externa no caminho crítico.
 
-```bash
-bash scripts/build-fonts.sh
-```
-
-| Arquivo | Peso | Tamanho |
-| --- | --- | --- |
-| `neo-sans-400.woff2` | 400 | 15 KB |
-| `neo-sans-500.woff2` | 500–600 | 12 KB |
-| `neo-sans-700.woff2` | 700 | 13 KB |
-| `neo-sans-900.woff2` | 800–900 | 13 KB |
-| `neo-sans-900-italic.woff2` | logotipo | 2 KB |
-
-O italic carrega só os 14 glifos de "MATHEUS BIANCARDINE" — daí os 2 KB.
-
-> **Licença:** Neo Sans Std é uma fonte comercial. Confirme que a campanha tem
-> licença de *webfont* antes de publicar. Se não tiver, troque por Saira
-> (`next/font/google`), que foi a substituta usada no arquivo de design.
+Só os pesos usados entram no bundle: Barlow 400/500/600/700 e Barlow Condensed
+**700** (todo elemento display é bold). São 5 arquivos, 78 KB.
 
 ---
 
@@ -164,21 +154,23 @@ contador de dias). Fontes com `immutable`.
 
 | | gzip |
 | --- | --- |
-| HTML | 14 KB |
-| CSS | 6,5 KB |
-| JS | 177 KB |
-| Fontes (3 pré-carregadas) | 30 KB |
-| **Total crítico** | **~227 KB** |
+| HTML | 8,5 KB |
+| CSS | 2,2 KB |
+| JS | 169 KB |
+| Fontes (5 woff2) | 78 KB |
+| **Total crítico** | **~251 KB** |
 
-Imagens sob demanda: hero em AVIF vai de **18 KB** (mobile, 640w) a **36 KB**
-(desktop, 1200w).
+Mais as artes: **104 KB** no desktop, **37 KB** no mobile.
 
-**Sobre os 177 KB de JS:** medindo uma página vazia no mesmo projeto, o piso do
+Para comparação, a referência baixa 449 KB só no `BLOCO1.webp`, porque nela o
+texto é pixel dentro da imagem.
+
+**Sobre os 169 KB de JS:** medindo uma página vazia no mesmo projeto, o piso do
 Next 16 + React 19 é **165 KB**. Ou seja, todo o código desta landing page —
-formulário, validação, máscara, CTA flutuante, `next/image` — soma ~12 KB. Os
-165 KB são o framework e não têm como sair enquanto o projeto for Next.js. Se
-esse número for inaceitável, o caminho é trocar de stack (Astro ou HTML estático
-levariam isso a ~5 KB), não otimizar o app.
+formulário, validação, máscara, CTA flutuante — soma ~4 KB. Os 165 KB são o
+framework e não têm como sair enquanto o projeto for Next.js. Se esse número for
+inaceitável, o caminho é trocar de stack (Astro ou HTML estático levariam isso a
+~5 KB), não otimizar o app.
 
 ### Por que webpack no build
 
@@ -191,51 +183,127 @@ continua no Turbopack pelo HMR. Para comparar de novo:
 
 ## Divergências resolvidas
 
+**Texto da arte virou HTML.** Na referência, os títulos dos blocos 1, 2 e 5 —
+e até o botão "QUERO DOAR" — são pixels dentro do `.webp`; o DOM só tem um `<a>`
+transparente por cima. As artes desta pasta são as mesmas **sem** texto, então
+aqui o texto é HTML de verdade: indexável, selecionável, acompanha o zoom do
+usuário e fica nítido em qualquer tela. O resultado visual é o mesmo.
+
+**Campos do formulário.** A referência usa 4 campos, sem bairro — foi o que
+seguimos. A única diferença: "Como você quer ajudar?" é um `<select>` com as 4
+opções do brief (Divulgação nas redes / Material de rua e bandeira / Organizar
+lideranças / Doação) em vez de campo de texto livre. Visualmente é a mesma pill;
+a diferença é que a resposta chega segmentável na planilha, que é justamente o
+objetivo declarado no brief. Trocar por texto livre é mudar uma linha em
+`lib/validation.ts`.
+
+**Confirmação em modal, não em redirect.** Ao salvar, a server action devolve
+`status: 'success'` e o `SupporterForm` abre o `SuccessModal` sobre a landing
+page — o visitante não perde a posição de scroll nem os UTMs da URL. O modal tem
+foco preso, fecha no Escape/backdrop e trava o scroll do body; como ele é
+renderizado a partir do markup do servidor, aparece também num envio sem
+JavaScript (o `<dialog>` nativo não faria isso, por ficar invisível até
+`showModal()`).
+
+A página `/obrigado` continua existindo (noindex) para link direto, mas **não é
+mais alcançada pelo fluxo do formulário** — a conversão acontece sem trocar de
+URL. Por isso o evento é disparado no lugar do pageview; veja abaixo.
+
+### Conversão para o time de tráfego
+
+Ao abrir o modal de sucesso, `lib/analytics.ts` empilha um único evento:
+
+```js
+window.dataLayer.push({ event: 'cadastro_apoiador' })
+```
+
+Configure o gatilho do GTM em **Custom Event → `cadastro_apoiador`** e pendure
+nele as tags de Google Ads / Meta / GA4. Não é preciso instalar nada no código:
+o push acontece mesmo antes do container carregar (o GTM foi desenhado para ler
+a fila do `dataLayer` quando inicializa), então basta colar o container.
+
+Três decisões que valem saber:
+
+- **Um sinal só.** O código não chama `gtag()` nem `fbq()` diretamente. Se
+  chamasse, e o container também disparasse no mesmo evento, cada lead contaria
+  duas vezes.
+- **Sem dado pessoal no payload.** O `dataLayer` é legível por qualquer tag da
+  página; nome e telefone ficam só na planilha.
+- **Cadastro repetido não conta.** Quem já está na planilha recebe
+  `status: 'duplicate'` e nenhum evento é disparado — o número de conversões
+  bate com o número de linhas novas.
+
+### Cadastro duplicado
+
+Antes de gravar, a action lê a coluna C (WhatsApp) da aba e compara **só os
+dígitos** — a planilha guarda o número como valor numérico e uma linha digitada
+à mão pode vir com máscara. Se já existir, nada é gravado e o modal abre na
+variante "você já está na lista".
+
+A checagem **falha para o lado seguro**: se a leitura der erro, o cadastro é
+gravado assim mesmo. Linha duplicada se limpa depois; apoiador perdido numa
+instabilidade do Google, não.
+
+Sobra uma janela de corrida de poucos milissegundos: dois envios simultâneos do
+mesmo número podem passar os dois. Fechar isso exigiria trancar a planilha a
+cada submit, o que custa mais do que o problema — na prática o caso real é o
+duplo clique, e esse a checagem pega.
+
+### Reset após o envio
+
+Confirmado o cadastro, o formulário atrás do modal é limpo e os campos ocultos
+de atribuição (UTMs, referrer, `openedAt`) são reescritos — `form.reset()` também
+zera os ocultos, então eles são repovoados logo depois. É o comportamento certo
+para o uso em rua: o mesmo celular passa de mão em mão e a próxima pessoa começa
+do zero, sem editar a resposta de quem veio antes.
+
+O `openedAt` **não** é reescrito quando o envio volta inválido: reiniciar a
+janela ali faria uma correção rápida parecer robô e ser descartada em silêncio.
+
 **Data da eleição.** O arquivo de design dizia 14/10/2026 e o brief estratégico,
 04/10/2026. O contador usa **04/10/2026**, que é o 1º turno oficial das eleições
-gerais de 2026 (domingo). Fica em `lib/site.ts`.
+gerais de 2026 (domingo) e o que a referência mostra. Fica em `lib/site.ts`.
 
-**"Pré-candidato".** O `logo.png` da pasta traz "PRÉ-CANDIDATO A DEPUTADO
-FEDERAL". O brief pede explicitamente remover o "pré", então o logotipo é
-renderizado como texto (Neo Sans Black Italic), como no arquivo de design.
+**Tipografia.** O PDF pede Neo Sans; a referência usa Barlow. Como a instrução
+foi priorizar a referência, o site está em Barlow — o que também elimina a
+questão de licença de webfont da Neo Sans.
 
-**Link do grupo de WhatsApp.** O design aponta para `wa.me/5531985931115`, que é
-uma conversa direta, não um convite de grupo. Configure
-`NEXT_PUBLIC_WHATSAPP_GROUP_URL` com o link real do
-`chat.whatsapp.com`; sem isso, o fallback é a conversa direta.
-
----
+**Link do grupo de WhatsApp.** Configure `NEXT_PUBLIC_WHATSAPP_GROUP_URL` com o
+convite real do `chat.whatsapp.com`; sem isso, o fallback é a conversa direta.
 
 ## Estrutura
 
 ```
 app/
-  layout.tsx          metadata, preload de fontes
-  page.tsx            home (JSON-LD, composição das seções)
+  layout.tsx          metadata + next/font
+  page.tsx            home (JSON-LD, composição dos blocos)
   actions.ts          server action do cadastro
-  obrigado/           thank you page (noindex, fora do fluxo — ver Notas)
-  globals.css         @font-face, tokens, reset, primitivos
-components/           uma seção por arquivo + CSS Module
+  obrigado/           thank you page (noindex)
+  globals.css         tokens, reset, primitivos (.shell .btn .eyebrow)
+components/
+  ArtBackdrop         <picture> art-directed das artes de bloco
+  DonationBlock       faixa "seja um apoiador" + bloco 1
+  Hero                bloco 2
+  Countdown           bloco 3
+  SignupSection       bloco 4 + SupporterForm
+  Manifesto           bloco 5
+  SiteFooter          bloco 6
+  FloatingCta         CTA fixo do mobile
 lib/
-  sheets.ts           OAuth2 service account + append (node:crypto)
+  sheets.ts           OAuth2 service account + append/read (node:crypto)
   validation.ts       regras compartilhadas cliente/servidor
+  analytics.ts        push de conversão no dataLayer
   site.ts             links, datas, constantes da campanha
-assets/               fotos otimizadas (import estático)
-public/
-  fonts/              WOFF2 subsetados
-  textures/           camadas decorativas (avif + jpg)
-scripts/              pipelines de fotos e fontes
+assets/fundos/        artes originais (fora do deploy)
+public/art/           artes otimizadas (avif/webp/jpg, desktop+mobile)
+scripts/              pipeline de assets
 ```
-
----
 
 ## Notas
 
-**Confirmação do cadastro.** A server action não redireciona mais: em caso de
-sucesso ela devolve `status: 'success'` e o `SupporterForm` abre o
-`SuccessModal` por cima da landing. A rota `/obrigado` continua no repositório,
-mas nada mais aponta para ela — pode ser removida junto com o `disallow` em
-`app/robots.ts`.
+**Rota `/obrigado`.** Continua no repositório, mas nada aponta para ela desde que
+a confirmação virou modal. Assim que o gatilho `cadastro_apoiador` estiver no
+GTM, pode ser removida junto com o `disallow` em `app/robots.ts`.
 
 `npm audit` reporta 3 advisories de severidade alta em `postcss` e `sharp`
 **dentro do próprio Next 16.2.12**. `npm audit fix --force` "resolve" fazendo

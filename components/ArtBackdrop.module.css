@@ -1,0 +1,15 @@
+.picture {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: block;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* Boards are composed with the subjects in the upper band, so anchor there
+     and let any overflow fall off the bottom, where the art is empty anyway. */
+  object-position: 50% 0%;
+}

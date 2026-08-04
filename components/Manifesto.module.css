@@ -1,117 +1,72 @@
 .section {
   position: relative;
   isolation: isolate;
-  background: var(--navy-deep);
+  display: flex;
+  align-items: center;
   overflow: hidden;
-}
-
-.backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: -2;
-  background-image: url('/textures/manifesto.jpg');
-  background-image: image-set(
-    url('/textures/manifesto.avif') type('image/avif'),
-    url('/textures/manifesto.jpg') type('image/jpeg')
-  );
-  background-size: cover;
-  background-position: 70% 30%;
-  opacity: 0.2;
-  filter: saturate(0.7);
+  border-top: 2px solid var(--primary);
 }
 
 .scrim {
   position: absolute;
   inset: 0;
-  z-index: -1;
-  background: linear-gradient(180deg, rgb(1 30 43 / 0.85), rgb(1 30 43 / 0.95));
+  z-index: 1;
+  background: linear-gradient(
+    180deg,
+    rgb(0 30 55 / 0.9) 0%,
+    rgb(0 30 55 / 0.82) 45%,
+    rgb(0 30 55 / 0.9) 100%
+  );
 }
 
 .inner {
-  display: grid;
-  gap: 1.25rem;
-  padding-block: 2.25rem 2.5rem;
-}
-
-.head,
-.body {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  gap: 0.875rem;
-  max-width: 47.5rem;
+  gap: 1.25rem;
+  padding-block: clamp(2.5rem, 1.5rem + 4vw, 5rem);
 }
 
 .title {
+  max-width: 56rem;
   font-size: var(--step-h2);
-  font-weight: 900;
-  line-height: 1.05;
+  line-height: 1.08;
   text-transform: uppercase;
 }
 
 .title em {
   font-style: normal;
-  color: var(--green);
+  color: var(--primary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 1.125rem;
+  max-width: 56rem;
 }
 
 .body p {
-  color: var(--ink-200);
-  line-height: 1.6;
+  font-size: clamp(0.9375rem, 0.9rem + 0.3vw, 1.125rem);
+  line-height: 1.55;
+  color: rgb(246 249 252 / 0.9);
 }
 
 .body strong {
   font-weight: 700;
-  color: var(--green);
+  color: var(--primary);
 }
 
 .body b {
-  font-weight: 800;
-  color: var(--ink);
+  font-weight: 700;
+  color: var(--fg);
 }
 
-.portrait {
-  position: relative;
-  aspect-ratio: 4 / 3;
-  border: 1px solid rgb(41 234 40 / 0.3);
-  border-radius: 0.75rem;
-  overflow: hidden;
-}
-
-.portrait img {
-  object-fit: cover;
-  object-position: 50% 18%;
-}
-
-@media (min-width: 64rem) {
-  .scrim {
-    background: linear-gradient(
-      90deg,
-      var(--navy-deep) 12%,
-      rgb(1 30 43 / 0.72) 60%,
-      rgb(1 46 64 / 0.35) 100%
-    );
-  }
-
-  .inner {
-    grid-template-columns: minmax(0, 1fr) 23.75rem;
-    align-items: start;
-    column-gap: 3.75rem;
-    row-gap: 1.375rem;
-    padding-block: 5.5rem 5.75rem;
-  }
-
-  .head,
-  .body {
-    grid-column: 1;
-    gap: 1.375rem;
-  }
-
-  /* On mobile the portrait breaks up the read, sitting between the headline
-     and the story. On desktop it spans both rows in the right column. */
-  .portrait {
-    grid-column: 2;
-    grid-row: 1 / span 2;
-    align-self: center;
-    aspect-ratio: 19 / 24;
-    border-radius: 0.875rem;
+/* Desktop pins the board's own proportions; on mobile the story is long enough
+   to set the height itself, and forcing a viewport height only adds dead space. */
+@media (min-width: 48rem) {
+  .section {
+    aspect-ratio: 1920 / 1080;
   }
 }

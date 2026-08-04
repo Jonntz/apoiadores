@@ -1,12 +1,10 @@
 import { Countdown } from '@/components/Countdown';
-import { DonationBar } from '@/components/DonationBar';
+import { DonationBlock } from '@/components/DonationBlock';
 import { FloatingCta } from '@/components/FloatingCta';
 import { Hero } from '@/components/Hero';
 import { Manifesto } from '@/components/Manifesto';
 import { SignupSection } from '@/components/SignupSection';
 import { SiteFooter } from '@/components/SiteFooter';
-import { SiteHeader } from '@/components/SiteHeader';
-import { SocialProof } from '@/components/SocialProof';
 import { CANDIDATE, LINKS, SITE_URL } from '@/lib/site';
 
 /**
@@ -53,12 +51,10 @@ export default function Home() {
         // Content is a literal defined above — no user input reaches it.
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <SiteHeader />
-      <DonationBar />
       <main id="conteudo">
+        <DonationBlock />
         <Hero />
         <Countdown />
-        <SocialProof />
         <SignupSection />
         <Manifesto />
       </main>

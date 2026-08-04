@@ -1,7 +1,28 @@
 import type { Metadata, Viewport } from 'next';
-import ReactDOM from 'react-dom';
+import { Barlow, Barlow_Condensed } from 'next/font/google';
 import { CANDIDATE, SITE_URL } from '@/lib/site';
 import './globals.css';
+
+/**
+ * Same pairing as the approved reference build. next/font downloads and
+ * self-hosts these at build time, so unlike the reference there is no
+ * fonts.googleapis.com round-trip on the critical path.
+ */
+const barlow = Barlow({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700'],
+  variable: '--font-body',
+  display: 'swap',
+});
+
+// 700 only: every display element (headings, buttons, eyebrows, labels) is
+// bold, so shipping the 600 cut would be ~15 KB nobody renders.
+const barlowCondensed = Barlow_Condensed({
+  subsets: ['latin'],
+  weight: ['700'],
+  variable: '--font-display',
+  display: 'swap',
+});
 
 const TITLE = `${CANDIDATE.name} — ${CANDIDATE.role} • ${CANDIDATE.state}`;
 const DESCRIPTION =
@@ -9,10 +30,7 @@ const DESCRIPTION =
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: {
-    default: TITLE,
-    template: `%s — ${CANDIDATE.name}`,
-  },
+  title: { default: TITLE, template: `%s — ${CANDIDATE.name}` },
   description: DESCRIPTION,
   applicationName: CANDIDATE.name,
   authors: [{ name: CANDIDATE.name }],
@@ -57,31 +75,13 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: '#012E40',
+  themeColor: '#001E37',
   colorScheme: 'dark',
 };
 
-/**
- * Above-the-fold weights only: the wordmark, the H1/CTA black, and body
- * regular. 500 and 700 appear further down the page and swap in on their own.
- *
- * ReactDOM.preload rather than <link> tags in <head>: React owns the resource
- * and emits it exactly once. Hand-written <head> links get hoisted *and* kept,
- * which duplicates every preload in the HTML.
- */
-const PRELOADED_FONTS = [
-  '/fonts/neo-sans-900.woff2',
-  '/fonts/neo-sans-400.woff2',
-  '/fonts/neo-sans-900-italic.woff2',
-];
-
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  for (const href of PRELOADED_FONTS) {
-    ReactDOM.preload(href, { as: 'font', type: 'font/woff2', crossOrigin: 'anonymous' });
-  }
-
   return (
-    <html lang="pt-BR">
+    <html lang="pt-BR" className={`${barlow.variable} ${barlowCondensed.variable}`}>
       <body>
         <a className="skip-link" href="#cadastro">
           Ir para o cadastro

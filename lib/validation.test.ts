@@ -31,29 +31,23 @@ test('requires a full name', () => {
   assert.match(String(validateField('nome', 'Maria')), /sobrenome/);
 });
 
-test('requires at least one way to help', () => {
-  assert.equal(validateField('ajuda', ['redes']), undefined);
-  assert.match(String(validateField('ajuda', [])), /ao menos uma/);
-  assert.match(String(validateField('ajuda', [''])), /ao menos uma/);
+test('requires a way to help from the known list', () => {
+  assert.equal(validateField('ajuda', 'redes'), undefined);
+  assert.match(String(validateField('ajuda', '')), /Escolha como/);
+  // A hand-crafted POST cannot smuggle in a value the select never offered.
+  assert.match(String(validateField('ajuda', 'hackeado')), /uma das opções/);
 });
 
 test('reports every missing field at once', () => {
-  const errors = validateAll({ nome: '', whatsapp: '', cidade: '', bairro: '', ajuda: [] });
-  assert.deepEqual(Object.keys(errors).sort(), [
-    'ajuda',
-    'bairro',
-    'cidade',
-    'nome',
-    'whatsapp',
-  ]);
+  const errors = validateAll({ nome: '', whatsapp: '', cidade: '', ajuda: '' });
+  assert.deepEqual(Object.keys(errors).sort(), ['ajuda', 'cidade', 'nome', 'whatsapp']);
 
   assert.deepEqual(
     validateAll({
       nome: 'Maria Silva',
       whatsapp: '(31) 98593-1115',
       cidade: 'Belo Horizonte',
-      bairro: 'Savassi',
-      ajuda: ['rua'],
+      ajuda: 'rua',
     }),
     {},
   );
@@ -64,16 +58,14 @@ test('normalizes into spreadsheet-ready values', () => {
     nome: '  Maria   Aparecida  Silva ',
     whatsapp: '(31) 98593-1115',
     cidade: ' Belo  Horizonte ',
-    bairro: ' Savassi ',
-    // An unknown value (a hand-crafted POST) is dropped rather than stored.
-    ajuda: ['redes', 'doacao', 'hackeado'],
+    // Stored as the human label so the sheet reads without a legend.
+    ajuda: 'redes',
   });
 
   assert.deepEqual(clean, {
     nome: 'Maria Aparecida Silva',
     whatsapp: '31985931115',
     cidade: 'Belo Horizonte',
-    bairro: 'Savassi',
-    ajuda: ['Divulgação nas redes', 'Doação'],
+    ajuda: 'Divulgação nas redes',
   });
 });

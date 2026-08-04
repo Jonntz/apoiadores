@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { trackSignupConversion } from '@/lib/analytics';
 import { CANDIDATE, LINKS, SITE_URL } from '@/lib/site';
 import { Arrow } from './Arrow';
 import styles from './SuccessModal.module.css';
@@ -39,8 +40,29 @@ const Close = (
   </svg>
 );
 
-export function SuccessModal({ onClose }: { onClose: () => void }) {
+/**
+ * `returning` is a supporter whose WhatsApp was already on the sheet: nothing
+ * was written, so the panel confirms rather than thanks — and no conversion is
+ * reported, since there is no new lead.
+ */
+export function SuccessModal({
+  onClose,
+  returning = false,
+}: {
+  onClose: () => void;
+  returning?: boolean;
+}) {
   const panelRef = useRef<HTMLDivElement>(null);
+  const reported = useRef(false);
+
+  useEffect(() => {
+    // Exactly once per confirmed registration. The ref survives StrictMode's
+    // double-invoked effects, which would otherwise count every lead twice in
+    // development and make the numbers impossible to trust while testing.
+    if (returning || reported.current) return;
+    reported.current = true;
+    trackSignupConversion();
+  }, [returning]);
 
   useEffect(() => {
     const panel = panelRef.current;
@@ -110,13 +132,15 @@ export function SuccessModal({ onClose }: { onClose: () => void }) {
         </button>
 
         <p className={styles.seal}>{Check}</p>
-        <p className="eyebrow">Cadastro confirmado</p>
+        <p className="eyebrow">{returning ? 'Você já está na lista' : 'Cadastro confirmado'}</p>
         <h2 className={styles.title} id="cadastro-sucesso-titulo">
-          Bem-vindo ao time, <em>multiplicador!</em>
+          {returning ? 'Você já é do time, ' : 'Bem-vindo ao time, '}
+          <em>multiplicador!</em>
         </h2>
         <p className={styles.lead}>
-          Falta só um passo: entre agora no grupo de WhatsApp da militância da sua região
-          para receber os materiais e as primeiras missões da semana.
+          {returning
+            ? 'Esse WhatsApp já está cadastrado, não precisa se inscrever de novo. Se ainda não entrou no grupo da militância da sua região, o link está logo abaixo.'
+            : 'Falta só um passo: entre agora no grupo de WhatsApp da militância da sua região para receber os materiais e as primeiras missões da semana.'}
         </p>
 
         <div className={styles.actions}>
@@ -140,9 +164,13 @@ export function SuccessModal({ onClose }: { onClose: () => void }) {
           </a>
         </div>
 
-        <p className={styles.hint}>
-          O link do grupo também foi enviado para o seu WhatsApp cadastrado.
-        </p>
+        {/* Only true when a row was just written — nothing is sent to someone
+            who was already on the list. */}
+        {returning ? null : (
+          <p className={styles.hint}>
+            O link do grupo também foi enviado para o seu WhatsApp cadastrado.
+          </p>
+        )}
 
         <ul className={styles.extras}>
           <li>

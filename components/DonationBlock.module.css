@@ -1,0 +1,91 @@
+/* --- Bloco 0: faixa "Seja um apoiador" ----------------------------------- */
+.topbar {
+  position: relative;
+  z-index: 2;
+  padding-block: 0.75rem;
+  background: var(--bg);
+  border-bottom: 2px solid var(--primary);
+  text-align: center;
+}
+
+.topbarText {
+  display: inline-block;
+  font-family: var(--display);
+  font-size: clamp(0.8125rem, 0.72rem + 0.4vw, 1.125rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.34em;
+  /* letter-spacing pads the right edge; pull it back so the dots read centred. */
+  text-indent: 0.34em;
+  text-transform: uppercase;
+  color: var(--primary);
+  text-shadow: 0 0 18px rgb(0 223 0 / 0.55);
+}
+
+/* --- Bloco 1: doação ------------------------------------------------------ */
+.section {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* Matches the board's own proportions so the composition never crops. */
+  aspect-ratio: 600 / 899;
+  overflow: hidden;
+}
+
+/* The boards fade to flat navy at the bottom; this keeps the seam invisible
+   when the section is taller than the art. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, transparent 40%, rgb(0 30 55 / 0.55) 72%, var(--bg) 99%);
+}
+
+.inner {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: clamp(1.75rem, 1rem + 3vw, 3.25rem);
+  text-align: center;
+}
+
+.headline {
+  font-size: var(--step-hero);
+  font-weight: 700;
+  line-height: 1.06;
+  text-transform: uppercase;
+  text-wrap: balance;
+}
+
+.headline em {
+  font-style: normal;
+  color: var(--primary);
+}
+
+.sub {
+  font-family: var(--display);
+  font-size: clamp(1.0625rem, 0.9rem + 0.7vw, 1.625rem);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--fg);
+}
+
+@media (min-width: 48rem) {
+  .section {
+    aspect-ratio: 1920 / 1080;
+  }
+
+  .scrim {
+    background: linear-gradient(180deg, transparent 46%, rgb(0 30 55 / 0.5) 76%, var(--bg) 99%);
+  }
+
+  .inner {
+    gap: 1.25rem;
+    padding-bottom: clamp(2rem, 0.5rem + 4vw, 4rem);
+  }
+}

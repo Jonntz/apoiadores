@@ -21,7 +21,7 @@ process.env.GOOGLE_SA_PRIVATE_KEY = `"${privateKey.replace(/\n/g, '\\n')}"`;
 process.env.SHEETS_SPREADSHEET_ID = 'sheet-id-123';
 process.env.SHEETS_TAB_NAME = 'Apoiadores';
 
-const { appendRow } = await import('./sheets.ts');
+const { appendRow, readColumn } = await import('./sheets.ts');
 
 type Call = { url: string; init: RequestInit };
 
@@ -104,6 +104,33 @@ test('reuses the cached token, then re-authenticates after a 401', async () => {
     (calls[1]!.init.headers as Record<string, string>).Authorization,
     'Bearer ya29.rotated',
   );
+});
+
+test('reads a column as strings, whatever type the sheet stored', async () => {
+  // USER_ENTERED turns an 11-digit phone into a *number*, so the dedupe check
+  // only works if numeric cells survive the round trip as their digits.
+  const calls = stubFetch(
+    () =>
+      new Response(
+        JSON.stringify({ values: [['WhatsApp', 31985931115, '(31) 98593-1116', null]] }),
+        { status: 200 },
+      ),
+  );
+
+  const column = await readColumn('C');
+
+  assert.deepEqual(column, ['WhatsApp', '31985931115', '(31) 98593-1116', '']);
+
+  const url = calls[0]!.url;
+  assert.ok(url.includes('/values/Apoiadores!C%3AC?'), url);
+  assert.ok(url.includes('majorDimension=COLUMNS'), url);
+  assert.ok(url.includes('valueRenderOption=UNFORMATTED_VALUE'), url);
+});
+
+test('treats an empty range as an empty column', async () => {
+  // The API omits `values` entirely when the range has no data.
+  stubFetch(() => new Response('{}', { status: 200 }));
+  assert.deepEqual(await readColumn('C'), []);
 });
 
 test('surfaces a missing environment variable by name', async () => {

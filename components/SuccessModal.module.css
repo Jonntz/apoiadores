@@ -1,5 +1,5 @@
-/* Above the sticky header (40), the floating CTA (50) and the skip link (100):
-   while the panel is open nothing behind it should be reachable. */
+/* Above the floating CTA (50) and the skip link (100): while the panel is open
+   nothing behind it should be reachable. */
 .overlay {
   position: fixed;
   inset: 0;
@@ -9,7 +9,7 @@
   justify-content: center;
   padding: 1.25rem;
   overflow-y: auto;
-  background: rgb(1 18 27 / 0.82);
+  background: rgb(0 15 28 / 0.82);
   backdrop-filter: blur(6px);
   animation: fade 0.2s ease both;
 }
@@ -28,33 +28,35 @@
   padding: 2.5rem 1.375rem 1.75rem;
   background: radial-gradient(
     120% 120% at 100% 0%,
-    var(--teal) 0%,
-    var(--navy) 55%,
-    var(--navy-deep) 100%
+    oklch(35% 0.09 200) 0%,
+    var(--bg) 55%,
+    oklch(17% 0.045 247) 100%
   );
-  border: 2px solid var(--green);
-  border-radius: 1rem;
+  border: 2px solid var(--primary);
+  border-radius: 1.25rem;
   box-shadow:
-    0 24px 70px rgb(1 18 27 / 0.7),
-    0 0 60px rgb(41 234 40 / 0.25);
+    0 24px 70px rgb(0 15 28 / 0.7),
+    0 0 60px rgb(0 223 0 / 0.25);
   text-align: center;
   overflow: hidden;
   outline: none;
   animation: rise 0.26s cubic-bezier(0.2, 0.8, 0.3, 1) both;
 }
 
+/* Reuses the donation board the page already downloaded for this viewport, so
+   the texture costs no extra request. */
 .texture {
   position: absolute;
   inset: 0;
   z-index: -1;
-  background-image: url('/textures/grupo.jpg');
+  background-image: url('/art/doacao-mobile.jpg');
   background-image: image-set(
-    url('/textures/grupo.avif') type('image/avif'),
-    url('/textures/grupo.jpg') type('image/jpeg')
+    url('/art/doacao-mobile.avif') type('image/avif'),
+    url('/art/doacao-mobile.jpg') type('image/jpeg')
   );
   background-size: cover;
   background-position: center;
-  opacity: 0.1;
+  opacity: 0.12;
 }
 
 .close {
@@ -67,10 +69,10 @@
   width: 2.25rem;
   height: 2.25rem;
   padding: 0;
-  background: rgb(255 255 255 / 0.06);
-  border: 1px solid rgb(255 255 255 / 0.14);
+  background: rgb(246 249 252 / 0.06);
+  border: 1px solid rgb(246 249 252 / 0.14);
   border-radius: 50%;
-  color: var(--ink-200);
+  color: rgb(246 249 252 / 0.85);
   cursor: pointer;
   transition:
     background-color 0.16s ease,
@@ -78,8 +80,8 @@
 }
 
 .close:hover {
-  background: rgb(255 255 255 / 0.14);
-  color: var(--ink);
+  background: rgb(246 249 252 / 0.14);
+  color: var(--fg);
 }
 
 .close svg {
@@ -94,10 +96,10 @@
   flex: none;
   width: 3.75rem;
   height: 3.75rem;
-  background: var(--green);
-  color: var(--navy);
+  background: var(--primary);
+  color: var(--primary-fg);
   border-radius: 50%;
-  box-shadow: 0 0 50px rgb(41 234 40 / 0.55);
+  box-shadow: var(--glow);
 }
 
 .seal svg {
@@ -107,19 +109,19 @@
 
 .title {
   font-size: clamp(1.5rem, 1.15rem + 1.5vw, 2.125rem);
-  font-weight: 900;
   line-height: 1.08;
+  text-transform: uppercase;
 }
 
 .title em {
   font-style: normal;
-  color: var(--green);
+  color: var(--primary);
 }
 
 .lead {
   font-size: var(--step-small);
   line-height: 1.5;
-  color: var(--ink-200);
+  color: rgb(246 249 252 / 0.9);
 }
 
 .actions {
@@ -133,7 +135,7 @@
 .hint {
   font-size: 0.6875rem;
   line-height: 1.45;
-  color: var(--ink-500);
+  color: var(--muted-fg);
 }
 
 .extras {
@@ -145,12 +147,16 @@
   width: 100%;
   margin-top: 0.375rem;
   padding-top: 0.875rem;
-  border-top: 1px solid rgb(255 255 255 / 0.12);
+  border-top: 1px solid rgb(246 249 252 / 0.12);
 }
 
 .extraLink {
   font-size: 0.8125rem;
-  font-weight: 700;
+  font-weight: 600;
+}
+
+.extraLink:hover {
+  text-decoration: underline;
 }
 
 @keyframes fade {
@@ -170,6 +176,14 @@
   .panel {
     gap: 0.9375rem;
     padding: 2.75rem 2.25rem 2rem;
+  }
+
+  .texture {
+    background-image: url('/art/doacao-desktop.jpg');
+    background-image: image-set(
+      url('/art/doacao-desktop.avif') type('image/avif'),
+      url('/art/doacao-desktop.jpg') type('image/jpeg')
+    );
   }
 
   .seal {

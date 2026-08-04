@@ -1,89 +1,54 @@
 /* ---------------------------------------------------------------------------
-   Neo Sans Std — subset to Latin + pt-BR accents by scripts/../buildfonts.
-   Five files, 68 KB total. Self-hosted: no third-party connection on the
-   critical path.
+   Tokens mirrored from the approved reference build. Colours are authored in
+   oklch (as in the reference) with an sRGB hex declared first, so engines
+   without oklch support still get the right colour instead of a blank cascade.
    --------------------------------------------------------------------------- */
-@font-face {
-  font-family: 'Neo Sans';
-  src: url('/fonts/neo-sans-400.woff2') format('woff2');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Neo Sans';
-  src: url('/fonts/neo-sans-500.woff2') format('woff2');
-  font-weight: 500 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Neo Sans';
-  src: url('/fonts/neo-sans-700.woff2') format('woff2');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Neo Sans';
-  src: url('/fonts/neo-sans-900.woff2') format('woff2');
-  font-weight: 800 900;
-  font-style: normal;
-  font-display: swap;
-}
-/* Wordmark only — 14 glyphs, 2 KB. */
-@font-face {
-  font-family: 'Neo Sans Wordmark';
-  src: url('/fonts/neo-sans-900-italic.woff2') format('woff2');
-  font-weight: 900;
-  font-style: italic;
-  font-display: swap;
-}
-
 :root {
-  /* Brand ---------------------------------------------------------------- */
-  --green: #29ea28;
-  --green-bright: #7cff6b;
-  --green-deep: #11a837;
-  --green-soft: #9fe8a6;
-  --teal: #03738c;
-  --navy: #012e40;
-  --navy-deep: #011e2b;
-  --navy-lift: #023647;
-
-  /* Text ----------------------------------------------------------------- */
-  --ink: #ffffff;
-  --ink-100: #e8f4f8;
-  --ink-200: #c7e3ec;
-  --ink-400: #8fb3bf;
-  --ink-500: #7fa5b2;
-  --ink-600: #6e93a1;
-
-  /* Form ----------------------------------------------------------------- */
-  --field: #06384a;
-  --field-border: #0c4f63;
-  --danger: #ff6b6b;
-  --danger-text: #ff8e8e;
-  --danger-soft: #ffc9c9;
-  --danger-bg: #3a1416;
+  --bg: #001e37;
+  --bg: oklch(22.87% 0.0603 247);
+  --fg: #f6f9fc;
+  --fg: oklch(98% 0.005 250);
+  --card: #081e33;
+  --card: oklch(23% 0.05 250);
+  --primary: #00df00;
+  --primary: oklch(78% 0.27 143);
+  --primary-fg: #001e37;
+  --primary-fg: oklch(22.87% 0.0603 247);
+  --secondary: #12283e;
+  --secondary: oklch(27% 0.05 250);
+  --muted-fg: #a5afba;
+  --muted-fg: oklch(75% 0.02 250);
+  --border: #233a51;
+  --border: oklch(34% 0.05 250);
+  --input: #192f46;
+  --input: oklch(30% 0.05 250);
+  --destructive: #ea2126;
+  --destructive: oklch(60% 0.23 27);
 
   /* Type ----------------------------------------------------------------- */
-  --font-sans: 'Neo Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --font-wordmark: 'Neo Sans Wordmark', 'Neo Sans', system-ui, sans-serif;
+  /* --font-display / --font-body are injected by next/font in app/layout.tsx */
+  --display: var(--font-display), 'Barlow Condensed', system-ui, sans-serif;
+  --body: var(--font-body), Barlow, system-ui, sans-serif;
 
-  /* Fluid scale: mobile value → desktop value across 390px…1440px. */
-  --step-eyebrow: clamp(0.5625rem, 0.49rem + 0.3vw, 0.75rem);
-  --step-small: clamp(0.75rem, 0.71rem + 0.17vw, 0.875rem);
-  --step-body: clamp(0.9375rem, 0.88rem + 0.24vw, 1.1875rem);
-  --step-lead: clamp(1rem, 0.9rem + 0.4vw, 1.3125rem);
-  --step-h3: clamp(1.1875rem, 1.05rem + 0.55vw, 1.625rem);
-  --step-h2: clamp(1.625rem, 1.15rem + 2vw, 3.25rem);
-  --step-h1: clamp(2.0625rem, 1.2rem + 3.6vw, 4.125rem);
+  /* Fluid scale: mobile → 1440px desktop, landing on the reference's sizes. */
+  --step-eyebrow: clamp(0.75rem, 0.7rem + 0.2vw, 0.875rem);
+  --step-small: clamp(0.8125rem, 0.78rem + 0.15vw, 0.9375rem);
+  --step-body: clamp(1rem, 0.95rem + 0.22vw, 1.25rem);
+  --step-btn: clamp(1.125rem, 1rem + 0.5vw, 1.5rem);
+  --step-h3: clamp(1.25rem, 1.1rem + 0.6vw, 1.75rem);
+  --step-h2: clamp(1.875rem, 1.2rem + 2.6vw, 3rem);
+  --step-h1: clamp(2.125rem, 1.3rem + 3.3vw, 3.75rem);
+  /* The two overlay headlines run larger than the rest. */
+  --step-hero: clamp(2rem, 1.1rem + 3.6vw, 3.5rem);
 
   /* Layout --------------------------------------------------------------- */
-  --shell: 90rem; /* 1440px design canvas */
-  --gutter: clamp(1.25rem, 0.5rem + 3vw, 4.5rem);
+  /* Content column measures 72rem (1152px) at desktop, matching the reference;
+     the gutter is added on top so the max-width is the *content* width. */
+  --shell: 72rem;
+  --gutter: clamp(1.25rem, 0.6rem + 2.6vw, 3rem);
   --radius: 0.75rem;
+  --glow: 0 0 20px rgb(0 223 0 / 0.6), 0 0 45px rgb(0 223 0 / 0.34);
+  --glow-soft: 0 0 16px rgb(0 223 0 / 0.4), 0 0 36px rgb(0 223 0 / 0.22);
 
   color-scheme: dark;
 }
@@ -98,19 +63,17 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  /* Keep anchored sections clear of the sticky header. */
-  scroll-padding-top: 5.5rem;
+  scroll-padding-top: 2rem;
 }
 
 body {
   margin: 0;
-  background: var(--navy-deep);
-  color: var(--ink-200);
-  font-family: var(--font-sans);
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--body);
   font-size: var(--step-body);
-  line-height: 1.55;
+  line-height: 1.5;
   -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
   overflow-x: hidden;
 }
 
@@ -119,15 +82,21 @@ h2,
 h3,
 p,
 figure,
-blockquote {
+blockquote,
+dl,
+dd {
+  /* dd carries a 40px margin-inline-start from the UA sheet — enough to throw a
+     centred value off-centre by half of it. */
   margin: 0;
 }
 
 h1,
 h2,
 h3 {
-  color: var(--ink);
-  letter-spacing: -0.025em;
+  font-family: var(--display);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--fg);
   text-wrap: balance;
 }
 
@@ -142,31 +111,115 @@ svg {
 }
 
 a {
-  color: var(--green);
+  color: var(--primary);
   text-decoration: none;
-}
-
-a:hover {
-  color: var(--green-bright);
 }
 
 button,
 input,
-textarea,
-select {
+select,
+textarea {
   font: inherit;
   color: inherit;
 }
 
-ul {
+ul,
+ol {
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* --- Primitives ----------------------------------------------------------- */
+/* Each sets one thing only — horizontal rhythm, or the button skin — so the
+   section modules keep full control of their own vertical padding. */
+
+.shell {
+  width: 100%;
+  max-width: calc(var(--shell) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+}
+
+.eyebrow {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--step-eyebrow);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--primary);
+}
+
+/* The signature control: condensed uppercase on a neon slab with a double
+   halo. Everything green on the page is one of these. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6em;
+  background: var(--primary);
+  color: var(--primary-fg);
+  font-family: var(--display);
+  font-size: var(--step-btn);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+  text-align: center;
+  padding: 1.05rem 1.6rem;
+  border: none;
+  border-radius: 1.25rem;
+  box-shadow: var(--glow);
+  cursor: pointer;
+  transition:
+    filter 0.18s ease,
+    transform 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.btn:hover {
+  color: var(--primary-fg);
+  filter: brightness(1.06);
+  transform: translateY(-2px);
+  box-shadow: 0 0 26px rgb(0 223 0 / 0.75), 0 0 58px rgb(0 223 0 / 0.4);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn--block {
+  display: flex;
+  width: 100%;
+}
+
+/* Secondary action next to a primary one: same shape, none of the pull. */
+.btn--ghost {
+  background: transparent;
+  color: var(--primary);
+  border: 1px solid rgb(0 223 0 / 0.55);
+  box-shadow: none;
+}
+
+.btn--ghost:hover {
+  color: var(--primary);
+  background: rgb(0 223 0 / 0.1);
+  border-color: var(--primary);
+  box-shadow: none;
+}
+
+.btn__arrow {
+  flex: none;
+  width: 0.85em;
+  height: 0.85em;
+  translate: 0 0.03em;
+}
+
 /* --- Accessibility -------------------------------------------------------- */
 :focus-visible {
-  outline: 3px solid var(--green);
+  outline: 3px solid var(--primary);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -189,108 +242,15 @@ ul {
   left: 0;
   z-index: 100;
   transform: translateY(-120%);
-  background: var(--green);
-  color: var(--navy);
-  font-weight: 900;
+  background: var(--primary);
+  color: var(--primary-fg);
+  font-weight: 700;
   padding: 0.75rem 1.25rem;
   border-radius: 0 0 var(--radius) 0;
 }
 
 .skip-link:focus-visible {
   transform: translateY(0);
-  color: var(--navy);
-}
-
-/* --- Primitives ----------------------------------------------------------- */
-/* Shared by every section. Each of these sets one thing only — horizontal
-   rhythm, or the button skin — so section modules stay free to own their own
-   vertical padding without a specificity fight. */
-
-.shell {
-  width: 100%;
-  max-width: var(--shell);
-  margin-inline: auto;
-  padding-inline: var(--gutter);
-}
-
-.eyebrow {
-  margin: 0;
-  font-size: var(--step-eyebrow);
-  font-weight: 700;
-  line-height: 1;
-  letter-spacing: 0.3em;
-  text-transform: uppercase;
-  color: var(--green);
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.625rem;
-  background: var(--green);
-  color: var(--navy);
-  font-size: var(--step-small);
-  font-weight: 900;
-  line-height: 1.2;
-  letter-spacing: 0.05em;
-  text-transform: uppercase;
-  text-align: center;
-  padding: 0.9375rem 1.5rem;
-  border: none;
-  border-radius: 0.5rem;
-  box-shadow: 0 0 26px rgb(41 234 40 / 0.4);
-  cursor: pointer;
-  transition:
-    filter 0.18s ease,
-    transform 0.18s ease,
-    box-shadow 0.18s ease;
-}
-
-.btn:hover {
-  color: var(--navy);
-  filter: brightness(1.08);
-  transform: translateY(-2px);
-  box-shadow: 0 10px 34px rgb(41 234 40 / 0.5);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn--lg {
-  gap: 0.875rem;
-  font-size: clamp(0.9375rem, 0.86rem + 0.3vw, 1.1875rem);
-  padding: clamp(1.125rem, 0.9rem + 0.9vw, 1.4375rem) clamp(1.25rem, 0.8rem + 1.8vw, 2.5rem);
-  border-radius: 0.75rem;
-  box-shadow: 0 14px 44px rgb(41 234 40 / 0.42);
-}
-
-.btn--block {
-  display: flex;
-  width: 100%;
-}
-
-/* Secondary CTA next to a solid one. The outline is an inset shadow rather than
-   a border so the two buttons keep the exact same box. */
-.btn--ghost {
-  background: rgb(41 234 40 / 0.08);
-  color: var(--green);
-  box-shadow: inset 0 0 0 2px rgb(41 234 40 / 0.55);
-}
-
-.btn--ghost:hover {
-  background: rgb(41 234 40 / 0.16);
-  color: var(--green-bright);
-  box-shadow: inset 0 0 0 2px var(--green);
-}
-
-.btn__arrow {
-  flex: none;
-  width: 1em;
-  height: 1em;
-  /* Optical: the glyph sits high next to uppercase text. */
-  translate: 0 0.05em;
 }
 
 @media (prefers-reduced-motion: reduce) {

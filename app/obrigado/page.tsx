@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { Arrow } from '@/components/Arrow';
-import { Wordmark } from '@/components/Wordmark';
 import { CANDIDATE, LINKS, SITE_URL } from '@/lib/site';
 import styles from './page.module.css';
 
@@ -27,19 +26,16 @@ const Check = (
   </svg>
 );
 
+const SHARE_URL = `https://wa.me/?text=${encodeURIComponent(
+  `Entrei para a militância do ${CANDIDATE.name}, candidato a ${CANDIDATE.role} por ${CANDIDATE.state}. Cadastre-se você também: ${SITE_URL}`,
+)}`;
+
 export default function ThankYou() {
   return (
     <div className={styles.page}>
-      <div className={styles.backdrop} aria-hidden="true" />
-
-      <header className={`shell ${styles.bar}`}>
-        <a href="/" aria-label="Matheus Biancardine — início">
-          <Wordmark size="1.5rem" showRole={false} />
-        </a>
-        <p className={styles.barRole}>
-          {CANDIDATE.role} &bull; {CANDIDATE.state}
-        </p>
-      </header>
+      <div className={styles.topbar}>
+        <span className={styles.topbarText}>&bull; Seja um apoiador &bull;</span>
+      </div>
 
       <main className={`shell ${styles.main}`}>
         <p className={styles.seal}>{Check}</p>
@@ -53,7 +49,7 @@ export default function ThankYou() {
         </p>
 
         <a
-          className="btn btn--lg"
+          className="btn"
           href={LINKS.whatsappGroup}
           target="_blank"
           rel="noopener noreferrer"
@@ -86,9 +82,7 @@ export default function ThankYou() {
             </p>
             <a
               className={styles.stepLink}
-              href={`https://wa.me/?text=${encodeURIComponent(
-                `Entrei para a militância do ${CANDIDATE.name}, candidato a ${CANDIDATE.role} por ${CANDIDATE.state}. Cadastre-se você também: ${SITE_URL}`,
-              )}`}
+              href={SHARE_URL}
               target="_blank"
               rel="noopener noreferrer"
             >

@@ -21,9 +21,10 @@ export type SupporterFields = {
   nome: string;
   whatsapp: string;
   cidade: string;
-  bairro: string;
-  ajuda: string[];
+  ajuda: string;
 };
+
+export const FIELD_NAMES = ['nome', 'whatsapp', 'cidade', 'ajuda'] as const;
 
 export type FieldErrors = Partial<Record<keyof SupporterFields, string>>;
 
@@ -50,18 +51,18 @@ function collapseSpaces(value: string): string {
 
 export function validateField(
   field: keyof SupporterFields,
-  value: string | string[],
+  value: string,
 ): string | undefined {
   switch (field) {
     case 'nome': {
-      const nome = collapseSpaces(String(value));
+      const nome = collapseSpaces(value);
       if (!nome) return 'Informe seu nome completo.';
       if (nome.length < 3) return 'Nome muito curto.';
       if (!nome.includes(' ')) return 'Informe nome e sobrenome.';
       return undefined;
     }
     case 'whatsapp': {
-      const digits = onlyDigits(String(value));
+      const digits = onlyDigits(value);
       if (!digits) return 'Informe seu WhatsApp com DDD.';
       // 11 digits = DDD + 9-digit mobile. WhatsApp only runs on mobile lines.
       if (digits.length !== 11) {
@@ -72,18 +73,12 @@ export function validateField(
       return undefined;
     }
     case 'cidade': {
-      if (!collapseSpaces(String(value))) return 'Campo obrigatório.';
-      return undefined;
-    }
-    case 'bairro': {
-      if (!collapseSpaces(String(value))) return 'Campo obrigatório.';
+      if (!collapseSpaces(value)) return 'Informe sua cidade.';
       return undefined;
     }
     case 'ajuda': {
-      const selected = Array.isArray(value) ? value : [value];
-      if (selected.filter(Boolean).length === 0) {
-        return 'Escolha ao menos uma forma de ajudar.';
-      }
+      if (!value) return 'Escolha como você quer ajudar.';
+      if (!HELP_LABELS.has(value)) return 'Escolha uma das opções da lista.';
       return undefined;
     }
   }
@@ -91,7 +86,7 @@ export function validateField(
 
 export function validateAll(fields: SupporterFields): FieldErrors {
   const errors: FieldErrors = {};
-  for (const key of ['nome', 'whatsapp', 'cidade', 'bairro', 'ajuda'] as const) {
+  for (const key of FIELD_NAMES) {
     const error = validateField(key, fields[key]);
     if (error) errors[key] = error;
   }
@@ -104,9 +99,7 @@ export function normalize(fields: SupporterFields) {
     nome: collapseSpaces(fields.nome),
     whatsapp: onlyDigits(fields.whatsapp),
     cidade: collapseSpaces(fields.cidade),
-    bairro: collapseSpaces(fields.bairro),
-    ajuda: fields.ajuda
-      .filter((value) => HELP_LABELS.has(value))
-      .map((value) => HELP_LABELS.get(value) as string),
+    // Stored as the human label so the sheet reads without a legend.
+    ajuda: HELP_LABELS.get(fields.ajuda) ?? '',
   };
 }

@@ -4,45 +4,27 @@
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  background: radial-gradient(
-    120% 120% at 100% 0%,
-    var(--teal) 0%,
-    var(--navy) 55%,
-    var(--navy-deep) 100%
-  );
+  background: linear-gradient(160deg, var(--bg) 0%, oklch(28% 0.07 220) 55%, var(--bg) 100%);
   overflow: hidden;
 }
 
-.backdrop {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: url('/textures/grupo.jpg');
-  background-image: image-set(
-    url('/textures/grupo.avif') type('image/avif'),
-    url('/textures/grupo.jpg') type('image/jpeg')
-  );
-  background-size: cover;
-  background-position: center;
-  opacity: 0.1;
+.topbar {
+  padding-block: 0.75rem;
+  border-bottom: 2px solid var(--primary);
+  text-align: center;
 }
 
-.bar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding-block: 1.25rem;
-  border-bottom: 1px solid rgb(41 234 40 / 0.22);
-}
-
-.barRole {
-  display: none;
-  font-size: 0.6875rem;
-  font-weight: 600;
-  letter-spacing: 0.22em;
-  color: var(--ink-400);
+.topbarText {
+  display: inline-block;
+  font-family: var(--display);
+  font-size: clamp(0.8125rem, 0.72rem + 0.4vw, 1.125rem);
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: 0.34em;
+  text-indent: 0.34em;
   text-transform: uppercase;
+  color: var(--primary);
+  text-shadow: 0 0 18px rgb(0 223 0 / 0.55);
 }
 
 .main {
@@ -51,8 +33,8 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
-  padding-block: 2.75rem 3.5rem;
+  gap: 1.125rem;
+  padding-block: clamp(2.5rem, 1.5rem + 4vw, 4.5rem);
   text-align: center;
 }
 
@@ -62,10 +44,10 @@
   justify-content: center;
   width: 4.5rem;
   height: 4.5rem;
-  background: var(--green);
-  color: var(--navy);
+  background: var(--primary);
+  color: var(--primary-fg);
   border-radius: 50%;
-  box-shadow: 0 0 60px rgb(41 234 40 / 0.55);
+  box-shadow: var(--glow);
 }
 
 .seal svg {
@@ -75,32 +57,32 @@
 
 .title {
   font-size: var(--step-h1);
-  font-weight: 900;
-  line-height: 1.05;
+  line-height: 1.1;
+  text-transform: uppercase;
 }
 
 .title em {
   font-style: normal;
-  color: var(--green);
+  color: var(--primary);
 }
 
 .lead {
   max-width: 40rem;
-  font-size: var(--step-lead);
-  color: var(--ink-200);
+  font-size: clamp(0.9375rem, 0.9rem + 0.3vw, 1.25rem);
+  color: rgb(246 249 252 / 0.9);
 }
 
 .hint {
-  font-size: var(--step-small);
-  font-weight: 500;
-  color: var(--ink-400);
+  font-size: 0.875rem;
+  color: var(--muted-fg);
 }
 
 .steps {
   display: grid;
   gap: 1rem;
   width: 100%;
-  margin-top: 1.125rem;
+  max-width: 60rem;
+  margin-top: 1rem;
   text-align: left;
 }
 
@@ -109,43 +91,37 @@
   flex-direction: column;
   gap: 0.5rem;
   padding: 1.25rem;
-  background: rgb(1 30 43 / 0.6);
-  border: 1px solid rgb(255 255 255 / 0.14);
-  border-radius: 0.75rem;
+  background: rgb(0 20 38 / 0.6);
+  border: 1px solid rgb(246 249 252 / 0.14);
+  border-radius: var(--radius);
 }
 
 .stepHighlight {
-  border-color: rgb(41 234 40 / 0.45);
+  border-color: rgb(0 223 0 / 0.45);
 }
 
 .stepTitle {
-  font-size: 0.9375rem;
-  font-weight: 900;
+  font-size: 1.0625rem;
   line-height: 1.2;
-  color: var(--green);
+  color: var(--primary);
 }
 
 .stepText {
   font-size: 0.875rem;
   line-height: 1.45;
-  color: var(--ink-200);
+  color: rgb(246 249 252 / 0.85);
 }
 
 .stepLink {
-  font-size: 0.8125rem;
-  font-weight: 700;
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+.stepLink:hover {
+  text-decoration: underline;
 }
 
 @media (min-width: 48rem) {
-  .barRole {
-    display: block;
-  }
-
-  .main {
-    gap: 1.375rem;
-    padding-block: 3.5rem 4.125rem;
-  }
-
   .seal {
     width: 5.25rem;
     height: 5.25rem;

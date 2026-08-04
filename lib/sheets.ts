@@ -95,10 +95,47 @@ async function getAccessToken(): Promise<string> {
   return token.access_token;
 }
 
+function sheetTab(): string {
+  return process.env.SHEETS_TAB_NAME ?? 'Apoiadores';
+}
+
+/**
+ * Reads a single column of the tab, top to bottom, as strings.
+ *
+ * UNFORMATTED_VALUE on purpose: `appendRow` writes with USER_ENTERED, so an
+ * 11-digit phone number lands in the sheet as a *number*. Read back formatted,
+ * it would come out however that column happens to be formatted (thousands
+ * separators, scientific notation); read unformatted it is a JSON number, which
+ * String() turns back into the original digits.
+ */
+export async function readColumn(column: string): Promise<string[]> {
+  const spreadsheetId = requireEnv('SHEETS_SPREADSHEET_ID');
+  const accessToken = await getAccessToken();
+
+  const url =
+    `https://sheets.googleapis.com/v4/spreadsheets/${encodeURIComponent(spreadsheetId)}` +
+    `/values/${encodeURIComponent(`${sheetTab()}!${column}:${column}`)}` +
+    `?majorDimension=COLUMNS&valueRenderOption=UNFORMATTED_VALUE`;
+
+  const response = await fetch(url, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+    cache: 'no-store',
+  });
+
+  if (!response.ok) {
+    if (response.status === 401) cachedToken = null;
+    throw new Error(`Sheets read failed (${response.status}): ${await response.text()}`);
+  }
+
+  // An empty range comes back as `{}` — no `values` key at all.
+  const body = (await response.json()) as { values?: unknown[][] };
+  return (body.values?.[0] ?? []).map((cell) => (cell == null ? '' : String(cell)));
+}
+
 /** Appends one row to the configured tab. */
 export async function appendRow(values: readonly (string | number)[]): Promise<void> {
   const spreadsheetId = requireEnv('SHEETS_SPREADSHEET_ID');
-  const tab = process.env.SHEETS_TAB_NAME ?? 'Apoiadores';
+  const tab = sheetTab();
   const accessToken = await getAccessToken();
 
   const url =
