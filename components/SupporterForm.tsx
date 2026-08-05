@@ -7,6 +7,7 @@ import {
   FIELD_NAMES,
   HELP_OPTIONS,
   formatWhatsapp,
+  validateAll,
   validateField,
   type FieldErrors,
   type SupporterFields,
@@ -115,6 +116,37 @@ export function SupporterForm() {
     setErrors((current) => ({ ...current, [field]: validateField(field, value) }));
   };
 
+  /**
+   * Every field is required, and this says so before the request leaves. The
+   * server runs the exact same rules right after and stays authoritative — this
+   * only spares the visitor a round trip to be told what the page already knows.
+   * Without JS the check simply does not run and the server answers instead.
+   */
+  const blockIfIncomplete = (event: React.FormEvent<HTMLFormElement>) => {
+    const form = event.currentTarget;
+    const read = (name: string) => {
+      const element = form.elements.namedItem(name);
+      return element instanceof HTMLInputElement || element instanceof HTMLSelectElement
+        ? element.value
+        : '';
+    };
+
+    const found = validateAll({
+      nome: read('nome'),
+      whatsapp: read('whatsapp'),
+      cidade: read('cidade'),
+      ajuda: read('ajuda'),
+    });
+
+    const firstInvalid = FIELD_NAMES.find((field) => found[field]);
+    if (!firstInvalid) return;
+
+    // React skips the server action when the submit event is default-prevented.
+    event.preventDefault();
+    setErrors(found);
+    document.getElementById(firstInvalid)?.focus();
+  };
+
   const hasErrors = FIELD_NAMES.some((field) => errors[field]);
 
   return (
@@ -122,8 +154,11 @@ export function SupporterForm() {
       ref={formRef}
       id={SIGNUP_FORM_ID}
       action={formAction}
+      onSubmit={blockIfIncomplete}
       className={styles.card}
       data-invalid={hasErrors || state.status === 'invalid' || state.status === 'error'}
+      /* Native bubbles off: the required fields are flagged through `required`
+         for assistive tech, but the messages are ours, in our copy and styling. */
       noValidate
     >
       {/* Rendered from the form so it also appears on a no-JS submit, where the
@@ -156,6 +191,7 @@ export function SupporterForm() {
               placeholder={field.label}
               autoComplete={field.autoComplete}
               enterKeyHint="next"
+              required
               disabled={isPending}
               aria-invalid={errors[field.name] ? true : undefined}
               aria-describedby={errors[field.name] ? `${field.name}-erro` : undefined}
@@ -191,6 +227,7 @@ export function SupporterForm() {
           className={`${styles.control} ${styles.select}`}
           value={ajuda}
           data-empty={ajuda === '' ? 'true' : undefined}
+          required
           disabled={isPending}
           aria-invalid={errors.ajuda ? true : undefined}
           aria-describedby={errors.ajuda ? 'ajuda-erro' : undefined}

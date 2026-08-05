@@ -3,7 +3,11 @@
   isolation: isolate;
   display: flex;
   align-items: center;
-  aspect-ratio: 600 / 899;
+  /* min-height rather than aspect-ratio: the board keeps the art's proportions
+     when the copy is short, but is now free to grow for the testimonial video
+     instead of clipping it against overflow: hidden. The backdrop is
+     object-fit: cover, so it fills whatever height this ends up being. */
+  min-height: 149.83vw;
   overflow: hidden;
 }
 
@@ -68,9 +72,25 @@
   color: var(--fg);
 }
 
+/* Portrait 9:16 depoimento. Kept narrow on purpose — at full column width a
+   vertical video would be taller than the viewport and push the CTA off it. */
+.video {
+  width: min(17rem, 100%);
+  height: auto;
+  aspect-ratio: 9 / 16;
+  background: #000;
+  border: 1px solid rgb(0 223 0 / 0.4);
+  border-radius: 1rem;
+  box-shadow: 0 18px 44px rgb(0 15 28 / 0.55);
+}
+
 @media (min-width: 48rem) {
   .hero {
-    aspect-ratio: 1920 / 1080;
+    min-height: 56.25vw;
+  }
+
+  .video {
+    width: 15rem;
   }
 
   .scrim {

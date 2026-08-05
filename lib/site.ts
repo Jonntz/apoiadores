@@ -14,14 +14,15 @@ export const CANDIDATE = {
 export const LINKS = {
   donate: 'https://queroapoiar.com.br/matheusbiancardine',
   instagram: 'https://www.instagram.com/matheus.biancardine',
-  whatsapp: 'https://wa.me/5531985931115',
+  /** Campaign line: (31) 99696-5298. */
+  whatsapp: 'https://wa.me/5531996965298',
   /**
    * Invite for the regional militancy group. Set NEXT_PUBLIC_WHATSAPP_GROUP_URL
    * to the real chat.whatsapp.com invite; until then this falls back to a direct
    * chat with the campaign line.
    */
   whatsappGroup:
-    process.env.NEXT_PUBLIC_WHATSAPP_GROUP_URL ?? 'https://wa.me/5531985931115',
+    process.env.NEXT_PUBLIC_WHATSAPP_GROUP_URL ?? 'https://wa.me/5531996965298',
 } as const;
 
 /**

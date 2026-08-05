@@ -162,13 +162,27 @@ contador de dias). Fontes com `immutable`.
 
 Mais as artes: **104 KB** no desktop, **37 KB** no mobile.
 
-Fora do caminho crítico, o **gtag.js pesa 165 KB gzip** (485 KB descomprimidos)
-— praticamente dobra o JS da página. Carrega depois que a página já está usável,
-então não entra em LCP nem em TTI, mas são 485 KB para o celular interpretar e
-executar depois. Se algum dia esse custo incomodar, a alternativa é trocar o
-gtag.js pelo **Measurement Protocol**, disparando a conversão do servidor dentro
-da própria server action: zero JS de terceiro no navegador. Dá mais trabalho e
-perde os relatórios automáticos de navegação do GA4.
+O **depoimento em vídeo** no Hero não entra nessa conta: com `preload="none"`,
+a página baixa só o poster (**35 KB**, WebP) e nenhum byte do MP4 até alguém
+apertar o play. Medido: zero requisições do `.mp4` no carregamento.
+
+Fora do caminho crítico, as tags de anúncio somam **377 KB transferidos**:
+
+| | |
+| --- | --- |
+| `gtag.js` (GA4) | 166 KB |
+| `fbevents.js` (Meta) | 104 KB |
+| config do pixel | 107 KB |
+
+É mais que o dobro do JS da própria página. Carregam depois que ela já está
+usável, então não entram em LCP nem em TTI — mas é trabalho que o celular ainda
+faz, e aparece no INP de aparelho fraco. Foi uma escolha de negócio, não um
+descuido: sem esses dois não há como otimizar campanha paga.
+
+Se um dia o custo incomodar, dá para mover as conversões para o servidor —
+**Measurement Protocol** (GA4) e **Conversions API** (Meta), disparados dentro
+da própria server action, com zero JS de terceiro no navegador. Dá mais
+trabalho, exige token de acesso e perde os relatórios automáticos de navegação.
 
 Para comparação, a referência baixa 449 KB só no `BLOCO1.webp`, porque nela o
 texto é pixel dentro da imagem.
@@ -197,8 +211,15 @@ transparente por cima. As artes desta pasta são as mesmas **sem** texto, então
 aqui o texto é HTML de verdade: indexável, selecionável, acompanha o zoom do
 usuário e fica nítido em qualquer tela. O resultado visual é o mesmo.
 
-**Campos do formulário.** A referência usa 4 campos, sem bairro — foi o que
-seguimos. A única diferença: "Como você quer ajudar?" é um `<select>` com as 4
+**Campos do formulário.** Os quatro são obrigatórios, checados nos dois lados:
+`required` no HTML (para leitores de tela anunciarem) mais uma checagem no
+`onSubmit` que bloqueia o envio e foca o primeiro campo vazio — sem ida ao
+servidor só para ouvir o que a página já sabia. O servidor roda exatamente as
+mesmas regras e continua sendo a autoridade, então um envio sem JavaScript é
+validado do mesmo jeito. As mensagens são nossas, não as bolhas nativas do
+navegador (daí o `noValidate` no `<form>`).
+
+A referência usa 4 campos, sem bairro — foi o que seguimos. A única diferença: "Como você quer ajudar?" é um `<select>` com as 4
 opções do brief (Divulgação nas redes / Material de rua e bandeira / Organizar
 lideranças / Doação) em vez de campo de texto livre. Visualmente é a mesma pill;
 a diferença é que a resposta chega segmentável na planilha, que é justamente o
@@ -217,40 +238,60 @@ A página `/obrigado` continua existindo (noindex) para link direto, mas **não 
 mais alcançada pelo fluxo do formulário** — a conversão acontece sem trocar de
 URL. Por isso o evento é disparado no lugar do pageview; veja abaixo.
 
-### Google Analytics e conversão
+### Analytics e conversão
 
-O site roda **gtag.js (GA4), medição `G-EPPF1NZDSD`**, carregado em
-`app/layout.tsx` com `strategy="afterInteractive"` — analytics nunca entra no
-caminho crítico. O ID sai de `NEXT_PUBLIC_GA_ID` se você quiser separar
-ambientes; o padrão está em `lib/analytics.ts`.
+Duas tags, ambas em `app/layout.tsx` com `strategy="afterInteractive"` —
+analytics nunca entra no caminho crítico:
 
-Ao abrir o modal de sucesso, o cadastro é reportado como evento GA4:
+| | ID | env para trocar |
+| --- | --- | --- |
+| GA4 (gtag.js) | `G-EPPF1NZDSD` | `NEXT_PUBLIC_GA_ID` |
+| Meta Pixel | `1059089453243567` | `NEXT_PUBLIC_META_PIXEL_ID` |
+
+O Meta ainda tem o `<noscript>` com o pixel em imagem, para quem navega sem
+JavaScript.
+
+Ao abrir o modal de sucesso, `lib/analytics.ts` reporta o lead às duas:
 
 ```js
-gtag('event', 'cadastro_apoiador')
+gtag('event', 'cadastro_apoiador')   // GA4
+fbq('track', 'Lead')                 // Meta
 ```
 
-**Falta um passo do lado do GA4:** coletar o evento não é o mesmo que contá-lo.
-Marque `cadastro_apoiador` como *evento-chave* em **Admin → Eventos** para ele
-virar conversão e ficar disponível no Google Ads.
+**Falta um passo em cada plataforma:**
 
-Quatro decisões que valem saber:
+- **GA4:** coletar o evento não é contá-lo. Marque `cadastro_apoiador` como
+  *evento-chave* em **Admin → Eventos**.
+- **Meta:** `Lead` é evento padrão, então já aparece no Ads Manager — mas
+  confira em **Eventos > Gerenciador** se o pixel está recebendo, e considere
+  verificar o domínio (sem isso, o iOS limita a atribuição).
 
-- **É `gtag()`, não `dataLayer.push({event})`.** Os dois formatos não são
+Cinco decisões que valem saber:
+
+- **Duas chamadas não são contagem dupla.** GA4 e Meta são independentes e não
+  enxergam os eventos um do outro: é um sinal para cada. O que *seria* dupla
+  contagem é colocar um container GTM que também dispare nesses mesmos eventos —
+  se isso acontecer, o disparo migra para o container e sai daqui.
+- **`gtag()`, não `dataLayer.push({event})`.** Os dois formatos não são
   intercambiáveis: o GTM escuta objetos com a chave `event`, enquanto o gtag.js
   trata o array como fila de `arguments` e ignora o resto. Um push simples
   nunca chegaria ao GA4.
-- **Um sinal só.** Se um container GTM entrar depois, ele dispara em cima deste
-  mesmo evento — disparar um segundo sinal aqui contaria cada lead duas vezes.
-- **Sem dado pessoal no payload.** O `dataLayer` é legível por qualquer tag da
-  página; nome e telefone ficam só na planilha.
+- **`Lead`, e não um evento customizado.** É o nome padrão do Meta para cadastro
+  concluído, e é o que permite escolher a conversão como objetivo de otimização
+  na campanha.
+- **Sem dado pessoal nos payloads.** Nome e telefone ficam só na planilha.
 - **Cadastro repetido não conta.** Quem já está na planilha recebe
-  `status: 'duplicate'` e nenhum evento é disparado — o número de conversões
-  bate com o número de linhas novas.
+  `status: 'duplicate'` e nenhuma das duas dispara — o número de conversões bate
+  com o número de linhas novas.
 
-O GA4 agrupa eventos antes de mandar: o hit de `cadastro_apoiador` sai cerca de
-**5 segundos** depois do envio, não na hora. Ao testar no DebugView, conte com
-esse atraso antes de achar que não funcionou.
+Duas armadilhas ao testar:
+
+- O GA4 agrupa eventos: o hit de `cadastro_apoiador` sai cerca de **5 segundos**
+  depois do envio. O Meta manda na hora.
+- O `fbevents.js` **suprime todos os eventos quando detecta automação**
+  (`navigator.webdriver`). Em navegador controlado por script o pixel carrega,
+  registra o ID e não envia nada — sem erro nenhum. Num navegador normal
+  funciona. Bloqueador de anúncio também derruba o pixel inteiro.
 
 ### Cadastro duplicado
 
@@ -288,13 +329,46 @@ foi priorizar a referência, o site está em Barlow — o que também elimina a
 questão de licença de webfont da Neo Sans.
 
 **Link do grupo de WhatsApp.** Configure `NEXT_PUBLIC_WHATSAPP_GROUP_URL` com o
-convite real do `chat.whatsapp.com`; sem isso, o fallback é a conversa direta.
+convite real do `chat.whatsapp.com`; sem isso, o fallback é a conversa direta
+com a linha da campanha, **(31) 99696-5298**.
+
+### Vídeo do depoimento
+
+O arquivo bruto (`assets/video_simoes.MP4`, 1080×1920, 2min45s, 9,6 Mbps,
+**194 MB**) não vai para o repositório — está no `.gitignore`. O que ficou
+versionado é a versão transcodificada:
+
+```
+ffmpeg -i assets/video_simoes.MP4 -vf scale=720:-2 \
+  -c:v libx264 -profile:v high -preset slow -crf 28 \
+  -maxrate 2000k -bufsize 4000k -c:a aac -b:a 128k \
+  -movflags +faststart -pix_fmt yuv420p public/video/simoes.mp4
+```
+
+194 MB → **22 MB**. O `+faststart` põe o índice no começo do arquivo, então a
+reprodução começa antes do download terminar (medido: tocando com 27s
+bufferizados, sem baixar os 22 MB).
+
+O poster saiu do frame de 3s. O `<video>` usa `preload="none"`, `controls` e
+`playsInline` — nada de autoplay: são 2min45s de fala, autoplay só gastaria
+banda de quem não pediu.
+
+Os 22 MB ficam no repositório porque a Vercel serve os estáticos direto do
+deploy. Se isso incomodar, o caminho é subir o arquivo para um bucket/CDN e
+apontar o `src` para lá — o componente não muda.
+
+**Legendas.** O vídeo já traz legendas queimadas na imagem, então surdos são
+atendidos. Não há `<track>` de legenda, o que significa que o texto não é
+selecionável nem indexável. Se quiser isso, é gerar um `.vtt` e adicionar um
+`<track kind="captions">` no `Hero.tsx`.
 
 ## Estrutura
 
 ```
 app/
-  layout.tsx          metadata + next/font
+  favicon.ico         monograma MB, 16/32/48 num único .ico (3,8 KB)
+  apple-icon.png      180×180 para a tela de início do iOS
+  layout.tsx          metadata + next/font + gtag.js
   page.tsx            home (JSON-LD, composição dos blocos)
   actions.ts          server action do cadastro
   obrigado/           thank you page (noindex)

@@ -33,7 +33,25 @@ export function Hero() {
           Não vamos entregar o Brasil à podridão ideológica da esquerda!
         </p>
 
-        <a className="btn" href="#cadastro">
+        {/* preload="none": the file is 22 MB, so nothing but the poster is
+            fetched until someone presses play. The poster carries the width and
+            height attributes' ratio, so the slot is reserved and the button
+            below it never jumps. */}
+        <video
+          className={styles.video}
+          src="/video/simoes.mp4"
+          poster="/video/simoes-poster.webp"
+          controls
+          preload="none"
+          playsInline
+          width={720}
+          height={1280}
+        >
+          Seu navegador não reproduz este vídeo.{' '}
+          <a href="/video/simoes.mp4">Baixe o depoimento</a>.
+        </video>
+
+        <a className="btn" href="#cadastro" style={{ marginBottom: '2rem'}}>
           Quero ser um apoiador
           {Arrow}
         </a>

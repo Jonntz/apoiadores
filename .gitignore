@@ -35,3 +35,11 @@ yarn-error.log*
 Fotos Biancardine 2026/
 neo-sans-std/
 *.pdf
+
+# Raw camera video: 194 MB at 9,6 Mbps. Git keeps every byte of it forever, and
+# nothing reads it after the transcode — what ships is public/video/simoes.mp4
+# (22 MB), which *is* committed because Vercel serves the repo.
+assets/*.mp4
+assets/*.MP4
+assets/*.mov
+assets/*.MOV
