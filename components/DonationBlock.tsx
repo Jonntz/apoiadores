@@ -1,4 +1,3 @@
-import { LINKS } from '@/lib/site';
 import { Arrow } from './Arrow';
 import { ArtBackdrop } from './ArtBackdrop';
 import styles from './DonationBlock.module.css';
