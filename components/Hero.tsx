@@ -33,6 +33,10 @@ export function Hero() {
           Não vamos entregar o Brasil à podridão ideológica da esquerda!
         </p>
 
+        <a className="btn" href="#cadastro" style={{ marginBottom: '2rem'}}>
+          Quero ser um apoiador
+          {Arrow}
+        </a>
         {/* preload="none": the file is 22 MB, so nothing but the poster is
             fetched until someone presses play. The poster carries the width and
             height attributes' ratio, so the slot is reserved and the button
@@ -51,10 +55,6 @@ export function Hero() {
           <a href="/video/simoes.mp4">Baixe o depoimento</a>.
         </video>
 
-        <a className="btn" href="#cadastro" style={{ marginBottom: '2rem'}}>
-          Quero ser um apoiador
-          {Arrow}
-        </a>
       </div>
     </section>
   );

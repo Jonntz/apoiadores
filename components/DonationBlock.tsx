@@ -38,11 +38,10 @@ export function DonationBlock() {
           <p className={styles.sub}>Considere fazer uma doação e ajudar a liberdade!</p>
           <a
             className="btn btn--lg"
-            href={LINKS.donate}
-            target="_blank"
+            href="#cadastro"
             rel="noopener noreferrer"
           >
-            Quero doar
+            Quero Entrar no Time!
             {Arrow}
           </a>
         </div>
